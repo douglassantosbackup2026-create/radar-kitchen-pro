@@ -3,7 +3,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { IndiceOportunidade } from "@/components/IndiceOportunidade";
 import { Painel } from "@/components/app/Pagina";
 import { Selo } from "@/components/Selo";
-import { brl, oportunidades } from "@/data/facaevenda";
+import { brl, oportunidades, type Oportunidade } from "@/data/facaevenda";
 
 export const Route = createFileRoute("/app/oportunidades/$slug")({
   loader: ({ params }) => {
@@ -42,7 +42,7 @@ function NaoEncontrada() {
 }
 
 function Detalhe() {
-  const { o } = Route.useLoaderData();
+  const { o } = Route.useLoaderData() as { o: Oportunidade };
   const [feitos, setFeitos] = useState<string[]>([]);
   const [noPlano, setNoPlano] = useState(false);
 
