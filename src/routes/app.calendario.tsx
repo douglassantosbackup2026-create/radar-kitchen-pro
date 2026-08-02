@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Pagina } from "@/components/app/Pagina";
-import { calendario } from "@/data/facaevenda";
+import { Carregando, Erro } from "@/components/app/Estado";
+import { useDatas } from "@/lib/db";
 
 export const Route = createFileRoute("/app/calendario")({
   head: () => ({
@@ -15,11 +16,15 @@ export const Route = createFileRoute("/app/calendario")({
 });
 
 function Calendario() {
+  const { data, isPending, isError } = useDatas();
+
   return (
     <Pagina titulo="Calendário Comercial" descricao="Você nunca fica perdida. Prepare-se com antecedência.">
+      {isPending && <Carregando />}
+      {isError && <Erro />}
       <ol className="relative space-y-6 border-l border-border pl-6">
-        {calendario.map((c) => (
-          <li key={c.mes} className="relative">
+        {data?.map((c) => (
+          <li key={c.id} className="relative">
             <span className="absolute -left-[1.9rem] top-2 h-3 w-3 rounded-full bg-gold" aria-hidden />
             <div className="rounded-2xl border border-border bg-card p-6">
               <p className="text-xs uppercase tracking-widest text-gold">{c.mes}</p>
