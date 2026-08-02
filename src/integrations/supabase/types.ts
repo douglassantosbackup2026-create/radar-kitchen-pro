@@ -14,7 +14,354 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      categorias: {
+        Row: {
+          created_at: string
+          icone: string
+          id: string
+          nome: string
+          ordem: number
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          icone?: string
+          id?: string
+          nome: string
+          ordem?: number
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          icone?: string
+          id?: string
+          nome?: string
+          ordem?: number
+          total?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      clientes: {
+        Row: {
+          aniversario: string
+          comprou: string
+          created_at: string
+          favorito: string
+          id: string
+          nome: string
+          telefone: string
+          ultimo_pedido: number
+          updated_at: string
+        }
+        Insert: {
+          aniversario?: string
+          comprou?: string
+          created_at?: string
+          favorito?: string
+          id?: string
+          nome: string
+          telefone?: string
+          ultimo_pedido?: number
+          updated_at?: string
+        }
+        Update: {
+          aniversario?: string
+          comprou?: string
+          created_at?: string
+          favorito?: string
+          id?: string
+          nome?: string
+          telefone?: string
+          ultimo_pedido?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      datas_comemorativas: {
+        Row: {
+          created_at: string
+          data: string
+          id: string
+          itens: string[]
+          mes: string
+          ordem: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          data: string
+          id?: string
+          itens?: string[]
+          mes: string
+          ordem?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          id?: string
+          itens?: string[]
+          mes?: string
+          ordem?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      itens_compra: {
+        Row: {
+          comprado: boolean
+          created_at: string
+          id: string
+          item: string
+          ordem: number
+          qtd: string
+          updated_at: string
+        }
+        Insert: {
+          comprado?: boolean
+          created_at?: string
+          id?: string
+          item: string
+          ordem?: number
+          qtd?: string
+          updated_at?: string
+        }
+        Update: {
+          comprado?: boolean
+          created_at?: string
+          id?: string
+          item?: string
+          ordem?: number
+          qtd?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      lancamentos: {
+        Row: {
+          created_at: string
+          descricao: string
+          dia: string
+          id: string
+          produto: string
+          tipo: string
+          updated_at: string
+          valor: number
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string
+          dia?: string
+          id?: string
+          produto?: string
+          tipo?: string
+          updated_at?: string
+          valor?: number
+        }
+        Update: {
+          created_at?: string
+          descricao?: string
+          dia?: string
+          id?: string
+          produto?: string
+          tipo?: string
+          updated_at?: string
+          valor?: number
+        }
+        Relationships: []
+      }
+      oportunidades: {
+        Row: {
+          categoria: string
+          checklist: string[]
+          como_vender: string[]
+          compras: string[]
+          created_at: string
+          criterios: Json
+          custo_unitario: number
+          demanda: number
+          destaque_do_dia: boolean
+          dificuldade: number
+          id: string
+          indice: number
+          ingredientes: string[]
+          investimento: number
+          lucro_estimado: number
+          nome: string
+          ordem: number
+          por_que: string[]
+          preco_sugerido: number
+          preparo: string[]
+          receita_da_semana: boolean
+          rendimento: string
+          selo: string
+          slug: string
+          tempo_min: number
+          updated_at: string
+          validade: string
+        }
+        Insert: {
+          categoria?: string
+          checklist?: string[]
+          como_vender?: string[]
+          compras?: string[]
+          created_at?: string
+          criterios?: Json
+          custo_unitario?: number
+          demanda?: number
+          destaque_do_dia?: boolean
+          dificuldade?: number
+          id?: string
+          indice?: number
+          ingredientes?: string[]
+          investimento?: number
+          lucro_estimado?: number
+          nome: string
+          ordem?: number
+          por_que?: string[]
+          preco_sugerido?: number
+          preparo?: string[]
+          receita_da_semana?: boolean
+          rendimento?: string
+          selo?: string
+          slug: string
+          tempo_min?: number
+          updated_at?: string
+          validade?: string
+        }
+        Update: {
+          categoria?: string
+          checklist?: string[]
+          como_vender?: string[]
+          compras?: string[]
+          created_at?: string
+          criterios?: Json
+          custo_unitario?: number
+          demanda?: number
+          destaque_do_dia?: boolean
+          dificuldade?: number
+          id?: string
+          indice?: number
+          ingredientes?: string[]
+          investimento?: number
+          lucro_estimado?: number
+          nome?: string
+          ordem?: number
+          por_que?: string[]
+          preco_sugerido?: number
+          preparo?: string[]
+          receita_da_semana?: boolean
+          rendimento?: string
+          selo?: string
+          slug?: string
+          tempo_min?: number
+          updated_at?: string
+          validade?: string
+        }
+        Relationships: []
+      }
+      pedidos: {
+        Row: {
+          cliente: string
+          created_at: string
+          entrega: string | null
+          id: string
+          pago: boolean
+          produto: string
+          qtd: number
+          status: string
+          updated_at: string
+          valor: number
+        }
+        Insert: {
+          cliente: string
+          created_at?: string
+          entrega?: string | null
+          id?: string
+          pago?: boolean
+          produto: string
+          qtd?: number
+          status?: string
+          updated_at?: string
+          valor?: number
+        }
+        Update: {
+          cliente?: string
+          created_at?: string
+          entrega?: string | null
+          id?: string
+          pago?: boolean
+          produto?: string
+          qtd?: number
+          status?: string
+          updated_at?: string
+          valor?: number
+        }
+        Relationships: []
+      }
+      tarefas_producao: {
+        Row: {
+          created_at: string
+          dia: string
+          feito: boolean
+          id: string
+          ordem: number
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          dia?: string
+          feito?: boolean
+          id?: string
+          ordem?: number
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          dia?: string
+          feito?: boolean
+          id?: string
+          ordem?: number
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tendencias: {
+        Row: {
+          created_at: string
+          id: string
+          nome: string
+          nota: string
+          ordem: number
+          selo: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nome: string
+          nota?: string
+          ordem?: number
+          selo?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nome?: string
+          nota?: string
+          ordem?: number
+          selo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
