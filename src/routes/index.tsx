@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { CalculadoraPreco } from "@/components/CalculadoraPreco";
 import { IndiceOportunidade } from "@/components/IndiceOportunidade";
 import { Selo } from "@/components/Selo";
@@ -86,6 +87,9 @@ function Landing() {
     <main>
       {/* HERO */}
       <section className="gold-grid relative overflow-hidden px-6 pb-20 pt-16 md:pb-28 md:pt-24">
+        <div className="mx-auto mb-8 flex max-w-6xl justify-end">
+          <ThemeToggle />
+        </div>
         <div className="mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-[1.05fr_0.95fr]">
           <div>
             <p className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-gold">
