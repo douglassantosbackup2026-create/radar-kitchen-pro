@@ -12,6 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AssinarRouteImport } from './routes/assinar'
+import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppOportunidadesIndexRouteImport } from './routes/app.oportunidades.index'
+import { Route as AppOportunidadesSlugRouteImport } from './routes/app.oportunidades.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,34 +31,75 @@ const AssinarRoute = AssinarRouteImport.update({
   path: '/assinar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOportunidadesIndexRoute = AppOportunidadesIndexRouteImport.update({
+  id: '/oportunidades/',
+  path: '/oportunidades/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOportunidadesSlugRoute = AppOportunidadesSlugRouteImport.update({
+  id: '/oportunidades/$slug',
+  path: '/oportunidades/$slug',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/app': typeof AppRoute
+  '/app': typeof AppRouteWithChildren
   '/assinar': typeof AssinarRoute
+  '/app/': typeof AppIndexRoute
+  '/app/oportunidades/$slug': typeof AppOportunidadesSlugRoute
+  '/app/oportunidades/': typeof AppOportunidadesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/app': typeof AppRoute
   '/assinar': typeof AssinarRoute
+  '/app': typeof AppIndexRoute
+  '/app/oportunidades/$slug': typeof AppOportunidadesSlugRoute
+  '/app/oportunidades': typeof AppOportunidadesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/app': typeof AppRoute
+  '/app': typeof AppRouteWithChildren
   '/assinar': typeof AssinarRoute
+  '/app/': typeof AppIndexRoute
+  '/app/oportunidades/$slug': typeof AppOportunidadesSlugRoute
+  '/app/oportunidades/': typeof AppOportunidadesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/app' | '/assinar'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/assinar'
+    | '/app/'
+    | '/app/oportunidades/$slug'
+    | '/app/oportunidades/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/app' | '/assinar'
-  id: '__root__' | '/' | '/app' | '/assinar'
+  to:
+    | '/'
+    | '/assinar'
+    | '/app'
+    | '/app/oportunidades/$slug'
+    | '/app/oportunidades'
+  id:
+    | '__root__'
+    | '/'
+    | '/app'
+    | '/assinar'
+    | '/app/'
+    | '/app/oportunidades/$slug'
+    | '/app/oportunidades/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AppRoute: typeof AppRoute
+  AppRoute: typeof AppRouteWithChildren
   AssinarRoute: typeof AssinarRoute
 }
 
@@ -82,12 +126,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AssinarRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/': {
+      id: '/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/oportunidades/': {
+      id: '/app/oportunidades/'
+      path: '/oportunidades'
+      fullPath: '/app/oportunidades/'
+      preLoaderRoute: typeof AppOportunidadesIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/oportunidades/$slug': {
+      id: '/app/oportunidades/$slug'
+      path: '/oportunidades/$slug'
+      fullPath: '/app/oportunidades/$slug'
+      preLoaderRoute: typeof AppOportunidadesSlugRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppIndexRoute: typeof AppIndexRoute
+  AppOportunidadesSlugRoute: typeof AppOportunidadesSlugRoute
+  AppOportunidadesIndexRoute: typeof AppOportunidadesIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppIndexRoute: AppIndexRoute,
+  AppOportunidadesSlugRoute: AppOportunidadesSlugRoute,
+  AppOportunidadesIndexRoute: AppOportunidadesIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AppRoute: AppRoute,
+  AppRoute: AppRouteWithChildren,
   AssinarRoute: AssinarRoute,
 }
 export const routeTree = rootRouteImport
