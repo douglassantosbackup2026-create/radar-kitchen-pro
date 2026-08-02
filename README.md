@@ -649,7 +649,7 @@ Não:
 
 SEÇÃO 2
 
-Enquanto milhares de pessoas passam horas procurando receitas no YouTube...
+Enquanto milhares de pessoas passam horas procurando receitas...
 
 Você abre a plataforma e encontra exatamente o que vale a pena produzir hoje.
 

@@ -168,7 +168,7 @@ function Landing() {
       {/* 2 - A DOR */}
       <Secao>
         <Titulo>
-          Enquanto milhares de pessoas passam horas procurando receitas no YouTube...
+          Enquanto milhares de pessoas passam horas procurando receitas...
         </Titulo>
         <p className="mt-6 max-w-2xl text-lg text-muted-foreground">
           Um vídeo diz para vender brownie. No outro dia, cocada. Depois pudim. Depois mandioca na
