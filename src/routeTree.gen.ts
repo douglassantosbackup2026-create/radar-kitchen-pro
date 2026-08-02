@@ -10,33 +10,229 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/app'
+import { Route as AssinarRouteImport } from './routes/assinar'
+import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppBibliotecaRouteImport } from './routes/app.biblioteca'
+import { Route as AppCalculadorasRouteImport } from './routes/app.calculadoras'
+import { Route as AppCalendarioRouteImport } from './routes/app.calendario'
+import { Route as AppClientesRouteImport } from './routes/app.clientes'
+import { Route as AppComprasRouteImport } from './routes/app.compras'
+import { Route as AppDesafiosRouteImport } from './routes/app.desafios'
+import { Route as AppFavoritosRouteImport } from './routes/app.favoritos'
+import { Route as AppFinanceiroRouteImport } from './routes/app.financeiro'
+import { Route as AppPedidosRouteImport } from './routes/app.pedidos'
+import { Route as AppProducaoRouteImport } from './routes/app.producao'
+import { Route as AppTendenciasRouteImport } from './routes/app.tendencias'
+import { Route as AppOportunidadesIndexRouteImport } from './routes/app.oportunidades.index'
+import { Route as AppOportunidadesSlugRouteImport } from './routes/app.oportunidades.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AssinarRoute = AssinarRouteImport.update({
+  id: '/assinar',
+  path: '/assinar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppBibliotecaRoute = AppBibliotecaRouteImport.update({
+  id: '/biblioteca',
+  path: '/biblioteca',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCalculadorasRoute = AppCalculadorasRouteImport.update({
+  id: '/calculadoras',
+  path: '/calculadoras',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCalendarioRoute = AppCalendarioRouteImport.update({
+  id: '/calendario',
+  path: '/calendario',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppClientesRoute = AppClientesRouteImport.update({
+  id: '/clientes',
+  path: '/clientes',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppComprasRoute = AppComprasRouteImport.update({
+  id: '/compras',
+  path: '/compras',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDesafiosRoute = AppDesafiosRouteImport.update({
+  id: '/desafios',
+  path: '/desafios',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFavoritosRoute = AppFavoritosRouteImport.update({
+  id: '/favoritos',
+  path: '/favoritos',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFinanceiroRoute = AppFinanceiroRouteImport.update({
+  id: '/financeiro',
+  path: '/financeiro',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPedidosRoute = AppPedidosRouteImport.update({
+  id: '/pedidos',
+  path: '/pedidos',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProducaoRoute = AppProducaoRouteImport.update({
+  id: '/producao',
+  path: '/producao',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTendenciasRoute = AppTendenciasRouteImport.update({
+  id: '/tendencias',
+  path: '/tendencias',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOportunidadesIndexRoute = AppOportunidadesIndexRouteImport.update({
+  id: '/oportunidades/',
+  path: '/oportunidades/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOportunidadesSlugRoute = AppOportunidadesSlugRouteImport.update({
+  id: '/oportunidades/$slug',
+  path: '/oportunidades/$slug',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
+  '/assinar': typeof AssinarRoute
+  '/app/biblioteca': typeof AppBibliotecaRoute
+  '/app/calculadoras': typeof AppCalculadorasRoute
+  '/app/calendario': typeof AppCalendarioRoute
+  '/app/clientes': typeof AppClientesRoute
+  '/app/compras': typeof AppComprasRoute
+  '/app/desafios': typeof AppDesafiosRoute
+  '/app/favoritos': typeof AppFavoritosRoute
+  '/app/financeiro': typeof AppFinanceiroRoute
+  '/app/pedidos': typeof AppPedidosRoute
+  '/app/producao': typeof AppProducaoRoute
+  '/app/tendencias': typeof AppTendenciasRoute
+  '/app/': typeof AppIndexRoute
+  '/app/oportunidades/$slug': typeof AppOportunidadesSlugRoute
+  '/app/oportunidades/': typeof AppOportunidadesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/assinar': typeof AssinarRoute
+  '/app/biblioteca': typeof AppBibliotecaRoute
+  '/app/calculadoras': typeof AppCalculadorasRoute
+  '/app/calendario': typeof AppCalendarioRoute
+  '/app/clientes': typeof AppClientesRoute
+  '/app/compras': typeof AppComprasRoute
+  '/app/desafios': typeof AppDesafiosRoute
+  '/app/favoritos': typeof AppFavoritosRoute
+  '/app/financeiro': typeof AppFinanceiroRoute
+  '/app/pedidos': typeof AppPedidosRoute
+  '/app/producao': typeof AppProducaoRoute
+  '/app/tendencias': typeof AppTendenciasRoute
+  '/app': typeof AppIndexRoute
+  '/app/oportunidades/$slug': typeof AppOportunidadesSlugRoute
+  '/app/oportunidades': typeof AppOportunidadesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
+  '/assinar': typeof AssinarRoute
+  '/app/biblioteca': typeof AppBibliotecaRoute
+  '/app/calculadoras': typeof AppCalculadorasRoute
+  '/app/calendario': typeof AppCalendarioRoute
+  '/app/clientes': typeof AppClientesRoute
+  '/app/compras': typeof AppComprasRoute
+  '/app/desafios': typeof AppDesafiosRoute
+  '/app/favoritos': typeof AppFavoritosRoute
+  '/app/financeiro': typeof AppFinanceiroRoute
+  '/app/pedidos': typeof AppPedidosRoute
+  '/app/producao': typeof AppProducaoRoute
+  '/app/tendencias': typeof AppTendenciasRoute
+  '/app/': typeof AppIndexRoute
+  '/app/oportunidades/$slug': typeof AppOportunidadesSlugRoute
+  '/app/oportunidades/': typeof AppOportunidadesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/assinar'
+    | '/app/biblioteca'
+    | '/app/calculadoras'
+    | '/app/calendario'
+    | '/app/clientes'
+    | '/app/compras'
+    | '/app/desafios'
+    | '/app/favoritos'
+    | '/app/financeiro'
+    | '/app/pedidos'
+    | '/app/producao'
+    | '/app/tendencias'
+    | '/app/'
+    | '/app/oportunidades/$slug'
+    | '/app/oportunidades/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/assinar'
+    | '/app/biblioteca'
+    | '/app/calculadoras'
+    | '/app/calendario'
+    | '/app/clientes'
+    | '/app/compras'
+    | '/app/desafios'
+    | '/app/favoritos'
+    | '/app/financeiro'
+    | '/app/pedidos'
+    | '/app/producao'
+    | '/app/tendencias'
+    | '/app'
+    | '/app/oportunidades/$slug'
+    | '/app/oportunidades'
+  id:
+    | '__root__'
+    | '/'
+    | '/app'
+    | '/assinar'
+    | '/app/biblioteca'
+    | '/app/calculadoras'
+    | '/app/calendario'
+    | '/app/clientes'
+    | '/app/compras'
+    | '/app/desafios'
+    | '/app/favoritos'
+    | '/app/financeiro'
+    | '/app/pedidos'
+    | '/app/producao'
+    | '/app/tendencias'
+    | '/app/'
+    | '/app/oportunidades/$slug'
+    | '/app/oportunidades/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  AssinarRoute: typeof AssinarRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,22 +244,162 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/assinar': {
+      id: '/assinar'
+      path: '/assinar'
+      fullPath: '/assinar'
+      preLoaderRoute: typeof AssinarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/': {
+      id: '/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/biblioteca': {
+      id: '/app/biblioteca'
+      path: '/biblioteca'
+      fullPath: '/app/biblioteca'
+      preLoaderRoute: typeof AppBibliotecaRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/calculadoras': {
+      id: '/app/calculadoras'
+      path: '/calculadoras'
+      fullPath: '/app/calculadoras'
+      preLoaderRoute: typeof AppCalculadorasRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/calendario': {
+      id: '/app/calendario'
+      path: '/calendario'
+      fullPath: '/app/calendario'
+      preLoaderRoute: typeof AppCalendarioRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/clientes': {
+      id: '/app/clientes'
+      path: '/clientes'
+      fullPath: '/app/clientes'
+      preLoaderRoute: typeof AppClientesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/compras': {
+      id: '/app/compras'
+      path: '/compras'
+      fullPath: '/app/compras'
+      preLoaderRoute: typeof AppComprasRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/desafios': {
+      id: '/app/desafios'
+      path: '/desafios'
+      fullPath: '/app/desafios'
+      preLoaderRoute: typeof AppDesafiosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/favoritos': {
+      id: '/app/favoritos'
+      path: '/favoritos'
+      fullPath: '/app/favoritos'
+      preLoaderRoute: typeof AppFavoritosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/financeiro': {
+      id: '/app/financeiro'
+      path: '/financeiro'
+      fullPath: '/app/financeiro'
+      preLoaderRoute: typeof AppFinanceiroRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/pedidos': {
+      id: '/app/pedidos'
+      path: '/pedidos'
+      fullPath: '/app/pedidos'
+      preLoaderRoute: typeof AppPedidosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/producao': {
+      id: '/app/producao'
+      path: '/producao'
+      fullPath: '/app/producao'
+      preLoaderRoute: typeof AppProducaoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/tendencias': {
+      id: '/app/tendencias'
+      path: '/tendencias'
+      fullPath: '/app/tendencias'
+      preLoaderRoute: typeof AppTendenciasRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/oportunidades/': {
+      id: '/app/oportunidades/'
+      path: '/oportunidades'
+      fullPath: '/app/oportunidades/'
+      preLoaderRoute: typeof AppOportunidadesIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/oportunidades/$slug': {
+      id: '/app/oportunidades/$slug'
+      path: '/oportunidades/$slug'
+      fullPath: '/app/oportunidades/$slug'
+      preLoaderRoute: typeof AppOportunidadesSlugRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppBibliotecaRoute: typeof AppBibliotecaRoute
+  AppCalculadorasRoute: typeof AppCalculadorasRoute
+  AppCalendarioRoute: typeof AppCalendarioRoute
+  AppClientesRoute: typeof AppClientesRoute
+  AppComprasRoute: typeof AppComprasRoute
+  AppDesafiosRoute: typeof AppDesafiosRoute
+  AppFavoritosRoute: typeof AppFavoritosRoute
+  AppFinanceiroRoute: typeof AppFinanceiroRoute
+  AppPedidosRoute: typeof AppPedidosRoute
+  AppProducaoRoute: typeof AppProducaoRoute
+  AppTendenciasRoute: typeof AppTendenciasRoute
+  AppIndexRoute: typeof AppIndexRoute
+  AppOportunidadesSlugRoute: typeof AppOportunidadesSlugRoute
+  AppOportunidadesIndexRoute: typeof AppOportunidadesIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppBibliotecaRoute: AppBibliotecaRoute,
+  AppCalculadorasRoute: AppCalculadorasRoute,
+  AppCalendarioRoute: AppCalendarioRoute,
+  AppClientesRoute: AppClientesRoute,
+  AppComprasRoute: AppComprasRoute,
+  AppDesafiosRoute: AppDesafiosRoute,
+  AppFavoritosRoute: AppFavoritosRoute,
+  AppFinanceiroRoute: AppFinanceiroRoute,
+  AppPedidosRoute: AppPedidosRoute,
+  AppProducaoRoute: AppProducaoRoute,
+  AppTendenciasRoute: AppTendenciasRoute,
+  AppIndexRoute: AppIndexRoute,
+  AppOportunidadesSlugRoute: AppOportunidadesSlugRoute,
+  AppOportunidadesIndexRoute: AppOportunidadesIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  AssinarRoute: AssinarRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
