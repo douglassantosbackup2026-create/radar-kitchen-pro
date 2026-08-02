@@ -197,6 +197,7 @@ export type Database = {
           descricao: string
           dia: string
           id: string
+          pedido_id: string | null
           produto: string
           tipo: string
           updated_at: string
@@ -207,6 +208,7 @@ export type Database = {
           descricao?: string
           dia?: string
           id?: string
+          pedido_id?: string | null
           produto?: string
           tipo?: string
           updated_at?: string
@@ -217,12 +219,21 @@ export type Database = {
           descricao?: string
           dia?: string
           id?: string
+          pedido_id?: string | null
           produto?: string
           tipo?: string
           updated_at?: string
           valor?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "lancamentos_pedido_id_fkey"
+            columns: ["pedido_id"]
+            isOneToOne: false
+            referencedRelation: "pedidos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       oportunidades: {
         Row: {
