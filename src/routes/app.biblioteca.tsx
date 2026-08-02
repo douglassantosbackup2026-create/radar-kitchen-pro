@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Pagina } from "@/components/app/Pagina";
-import { categorias, oportunidades } from "@/data/facaevenda";
+import { Carregando, Erro } from "@/components/app/Estado";
+import { useCategorias, useOportunidades } from "@/lib/db";
 
 export const Route = createFileRoute("/app/biblioteca")({
   head: () => ({
@@ -15,11 +16,16 @@ export const Route = createFileRoute("/app/biblioteca")({
 });
 
 function Biblioteca() {
+  const categorias = useCategorias();
+  const receitas = useOportunidades();
+
   return (
     <Pagina titulo="Biblioteca" descricao="Todas as receitas. Organizadas por categoria, nunca em PDF.">
+      {categorias.isError && <Erro />}
+      {categorias.isPending && <Carregando />}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        {categorias.map((c) => (
-          <div key={c.nome} className="rounded-2xl border border-border bg-card p-5">
+        {categorias.data?.map((c) => (
+          <div key={c.id} className="rounded-2xl border border-border bg-card p-5">
             <span className="text-2xl" aria-hidden>
               {c.icone}
             </span>
@@ -32,8 +38,9 @@ function Biblioteca() {
       <h2 className="mt-10 text-xs font-semibold uppercase tracking-widest text-gold">
         Adicionadas recentemente
       </h2>
+      {receitas.isPending && <Carregando />}
       <ul className="mt-4 divide-y divide-border rounded-2xl border border-border bg-card">
-        {oportunidades.map((o) => (
+        {receitas.data?.lista.map((o) => (
           <li key={o.slug}>
             <Link
               to="/app/oportunidades/$slug"
