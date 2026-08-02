@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Pagina, Painel } from "@/components/app/Pagina";
+import { Carregando, Erro } from "@/components/app/Estado";
 import { Selo } from "@/components/Selo";
-import { calendario, tendencias, maisVendidas, type Selo as SeloTipo } from "@/data/facaevenda";
+import { maisVendidas, type Selo as SeloTipo } from "@/data/facaevenda";
+import { useDatas, useTendencias } from "@/lib/db";
 
 export const Route = createFileRoute("/app/tendencias")({
   head: () => ({
@@ -16,13 +18,18 @@ export const Route = createFileRoute("/app/tendencias")({
 });
 
 function Tendencias() {
+  const tendencias = useTendencias();
+  const datas = useDatas();
+
   return (
     <Pagina titulo="Tendências" descricao="Essa semana, segundo o Radar Faça & Venda™.">
       <div className="grid gap-6 lg:grid-cols-2">
         <Painel titulo="📈 Explodindo agora">
+          {tendencias.isPending && <Carregando />}
+          {tendencias.isError && <Erro />}
           <ul className="space-y-4">
-            {tendencias.map((t) => (
-              <li key={t.nome} className="flex items-start justify-between gap-4">
+            {tendencias.data?.map((t) => (
+              <li key={t.id} className="flex items-start justify-between gap-4">
                 <div>
                   <p className="font-display font-semibold">{t.nome}</p>
                   <p className="text-sm text-muted-foreground">{t.nota}</p>
@@ -44,8 +51,8 @@ function Tendencias() {
         </Painel>
       </div>
       <div className="mt-6 grid gap-6 sm:grid-cols-2">
-        {calendario.slice(0, 2).map((c) => (
-          <Painel key={c.mes} titulo={`📅 ${c.data}`}>
+        {datas.data?.slice(0, 2).map((c) => (
+          <Painel key={c.id} titulo={`📅 ${c.data}`}>
             <ul className="space-y-1.5 text-sm text-muted-foreground">
               {c.itens.map((i) => (
                 <li key={i}>{i}</li>
