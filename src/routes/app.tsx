@@ -1,5 +1,6 @@
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { modulos } from "@/data/facaevenda";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const Route = createFileRoute("/app")({
   component: AppLayout,
@@ -9,11 +10,14 @@ function AppLayout() {
   return (
     <div className="flex min-h-screen">
       <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar p-4 lg:flex">
-        <Link to="/" className="px-3 py-2">
-          <span className="font-display text-lg font-bold">
-            Faça &amp; Venda <span className="text-gold">PRO</span>
-          </span>
-        </Link>
+        <div className="flex items-center justify-between gap-2 px-3 py-2">
+          <Link to="/">
+            <span className="font-display text-lg font-bold">
+              Faça &amp; Venda <span className="text-gold">PRO</span>
+            </span>
+          </Link>
+          <ThemeToggle />
+        </div>
         <nav className="mt-6 flex-1 space-y-1 overflow-y-auto">
           {modulos.map((m) => (
             <Link
@@ -37,8 +41,9 @@ function AppLayout() {
       </aside>
 
       <div className="min-w-0 flex-1">
-        <nav className="flex gap-1 overflow-x-auto border-b border-border bg-sidebar p-2 lg:hidden">
-          {modulos.map((m) => (
+        <div className="flex items-center gap-1 border-b border-border bg-sidebar p-2 lg:hidden">
+          <nav className="flex flex-1 gap-1 overflow-x-auto">
+            {modulos.map((m) => (
             <Link
               key={m.to}
               to={m.to}
@@ -48,8 +53,10 @@ function AppLayout() {
             >
               <span aria-hidden>{m.icone}</span> {m.label}
             </Link>
-          ))}
-        </nav>
+            ))}
+          </nav>
+          <ThemeToggle className="shrink-0" />
+        </div>
         <main className="mx-auto max-w-5xl px-5 py-8 md:px-8 md:py-10">
           <Outlet />
         </main>
