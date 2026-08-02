@@ -96,6 +96,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
+    scripts: [{ children: temaScript }],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -107,7 +108,6 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: temaScript }} />
         <HeadContent />
       </head>
       <body>
