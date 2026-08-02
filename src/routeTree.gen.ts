@@ -16,6 +16,13 @@ import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppBibliotecaRouteImport } from './routes/app.biblioteca'
 import { Route as AppCalculadorasRouteImport } from './routes/app.calculadoras'
 import { Route as AppCalendarioRouteImport } from './routes/app.calendario'
+import { Route as AppClientesRouteImport } from './routes/app.clientes'
+import { Route as AppComprasRouteImport } from './routes/app.compras'
+import { Route as AppDesafiosRouteImport } from './routes/app.desafios'
+import { Route as AppFavoritosRouteImport } from './routes/app.favoritos'
+import { Route as AppFinanceiroRouteImport } from './routes/app.financeiro'
+import { Route as AppPedidosRouteImport } from './routes/app.pedidos'
+import { Route as AppProducaoRouteImport } from './routes/app.producao'
 import { Route as AppTendenciasRouteImport } from './routes/app.tendencias'
 import { Route as AppOportunidadesIndexRouteImport } from './routes/app.oportunidades.index'
 import { Route as AppOportunidadesSlugRouteImport } from './routes/app.oportunidades.$slug'
@@ -55,6 +62,41 @@ const AppCalendarioRoute = AppCalendarioRouteImport.update({
   path: '/calendario',
   getParentRoute: () => AppRoute,
 } as any)
+const AppClientesRoute = AppClientesRouteImport.update({
+  id: '/clientes',
+  path: '/clientes',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppComprasRoute = AppComprasRouteImport.update({
+  id: '/compras',
+  path: '/compras',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDesafiosRoute = AppDesafiosRouteImport.update({
+  id: '/desafios',
+  path: '/desafios',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFavoritosRoute = AppFavoritosRouteImport.update({
+  id: '/favoritos',
+  path: '/favoritos',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFinanceiroRoute = AppFinanceiroRouteImport.update({
+  id: '/financeiro',
+  path: '/financeiro',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPedidosRoute = AppPedidosRouteImport.update({
+  id: '/pedidos',
+  path: '/pedidos',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProducaoRoute = AppProducaoRouteImport.update({
+  id: '/producao',
+  path: '/producao',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppTendenciasRoute = AppTendenciasRouteImport.update({
   id: '/tendencias',
   path: '/tendencias',
@@ -78,6 +120,13 @@ export interface FileRoutesByFullPath {
   '/app/biblioteca': typeof AppBibliotecaRoute
   '/app/calculadoras': typeof AppCalculadorasRoute
   '/app/calendario': typeof AppCalendarioRoute
+  '/app/clientes': typeof AppClientesRoute
+  '/app/compras': typeof AppComprasRoute
+  '/app/desafios': typeof AppDesafiosRoute
+  '/app/favoritos': typeof AppFavoritosRoute
+  '/app/financeiro': typeof AppFinanceiroRoute
+  '/app/pedidos': typeof AppPedidosRoute
+  '/app/producao': typeof AppProducaoRoute
   '/app/tendencias': typeof AppTendenciasRoute
   '/app/': typeof AppIndexRoute
   '/app/oportunidades/$slug': typeof AppOportunidadesSlugRoute
@@ -89,6 +138,13 @@ export interface FileRoutesByTo {
   '/app/biblioteca': typeof AppBibliotecaRoute
   '/app/calculadoras': typeof AppCalculadorasRoute
   '/app/calendario': typeof AppCalendarioRoute
+  '/app/clientes': typeof AppClientesRoute
+  '/app/compras': typeof AppComprasRoute
+  '/app/desafios': typeof AppDesafiosRoute
+  '/app/favoritos': typeof AppFavoritosRoute
+  '/app/financeiro': typeof AppFinanceiroRoute
+  '/app/pedidos': typeof AppPedidosRoute
+  '/app/producao': typeof AppProducaoRoute
   '/app/tendencias': typeof AppTendenciasRoute
   '/app': typeof AppIndexRoute
   '/app/oportunidades/$slug': typeof AppOportunidadesSlugRoute
@@ -102,6 +158,13 @@ export interface FileRoutesById {
   '/app/biblioteca': typeof AppBibliotecaRoute
   '/app/calculadoras': typeof AppCalculadorasRoute
   '/app/calendario': typeof AppCalendarioRoute
+  '/app/clientes': typeof AppClientesRoute
+  '/app/compras': typeof AppComprasRoute
+  '/app/desafios': typeof AppDesafiosRoute
+  '/app/favoritos': typeof AppFavoritosRoute
+  '/app/financeiro': typeof AppFinanceiroRoute
+  '/app/pedidos': typeof AppPedidosRoute
+  '/app/producao': typeof AppProducaoRoute
   '/app/tendencias': typeof AppTendenciasRoute
   '/app/': typeof AppIndexRoute
   '/app/oportunidades/$slug': typeof AppOportunidadesSlugRoute
@@ -116,6 +179,13 @@ export interface FileRouteTypes {
     | '/app/biblioteca'
     | '/app/calculadoras'
     | '/app/calendario'
+    | '/app/clientes'
+    | '/app/compras'
+    | '/app/desafios'
+    | '/app/favoritos'
+    | '/app/financeiro'
+    | '/app/pedidos'
+    | '/app/producao'
     | '/app/tendencias'
     | '/app/'
     | '/app/oportunidades/$slug'
@@ -127,6 +197,13 @@ export interface FileRouteTypes {
     | '/app/biblioteca'
     | '/app/calculadoras'
     | '/app/calendario'
+    | '/app/clientes'
+    | '/app/compras'
+    | '/app/desafios'
+    | '/app/favoritos'
+    | '/app/financeiro'
+    | '/app/pedidos'
+    | '/app/producao'
     | '/app/tendencias'
     | '/app'
     | '/app/oportunidades/$slug'
@@ -139,6 +216,13 @@ export interface FileRouteTypes {
     | '/app/biblioteca'
     | '/app/calculadoras'
     | '/app/calendario'
+    | '/app/clientes'
+    | '/app/compras'
+    | '/app/desafios'
+    | '/app/favoritos'
+    | '/app/financeiro'
+    | '/app/pedidos'
+    | '/app/producao'
     | '/app/tendencias'
     | '/app/'
     | '/app/oportunidades/$slug'
@@ -202,6 +286,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCalendarioRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/clientes': {
+      id: '/app/clientes'
+      path: '/clientes'
+      fullPath: '/app/clientes'
+      preLoaderRoute: typeof AppClientesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/compras': {
+      id: '/app/compras'
+      path: '/compras'
+      fullPath: '/app/compras'
+      preLoaderRoute: typeof AppComprasRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/desafios': {
+      id: '/app/desafios'
+      path: '/desafios'
+      fullPath: '/app/desafios'
+      preLoaderRoute: typeof AppDesafiosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/favoritos': {
+      id: '/app/favoritos'
+      path: '/favoritos'
+      fullPath: '/app/favoritos'
+      preLoaderRoute: typeof AppFavoritosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/financeiro': {
+      id: '/app/financeiro'
+      path: '/financeiro'
+      fullPath: '/app/financeiro'
+      preLoaderRoute: typeof AppFinanceiroRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/pedidos': {
+      id: '/app/pedidos'
+      path: '/pedidos'
+      fullPath: '/app/pedidos'
+      preLoaderRoute: typeof AppPedidosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/producao': {
+      id: '/app/producao'
+      path: '/producao'
+      fullPath: '/app/producao'
+      preLoaderRoute: typeof AppProducaoRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/tendencias': {
       id: '/app/tendencias'
       path: '/tendencias'
@@ -230,6 +363,13 @@ interface AppRouteChildren {
   AppBibliotecaRoute: typeof AppBibliotecaRoute
   AppCalculadorasRoute: typeof AppCalculadorasRoute
   AppCalendarioRoute: typeof AppCalendarioRoute
+  AppClientesRoute: typeof AppClientesRoute
+  AppComprasRoute: typeof AppComprasRoute
+  AppDesafiosRoute: typeof AppDesafiosRoute
+  AppFavoritosRoute: typeof AppFavoritosRoute
+  AppFinanceiroRoute: typeof AppFinanceiroRoute
+  AppPedidosRoute: typeof AppPedidosRoute
+  AppProducaoRoute: typeof AppProducaoRoute
   AppTendenciasRoute: typeof AppTendenciasRoute
   AppIndexRoute: typeof AppIndexRoute
   AppOportunidadesSlugRoute: typeof AppOportunidadesSlugRoute
@@ -240,6 +380,13 @@ const AppRouteChildren: AppRouteChildren = {
   AppBibliotecaRoute: AppBibliotecaRoute,
   AppCalculadorasRoute: AppCalculadorasRoute,
   AppCalendarioRoute: AppCalendarioRoute,
+  AppClientesRoute: AppClientesRoute,
+  AppComprasRoute: AppComprasRoute,
+  AppDesafiosRoute: AppDesafiosRoute,
+  AppFavoritosRoute: AppFavoritosRoute,
+  AppFinanceiroRoute: AppFinanceiroRoute,
+  AppPedidosRoute: AppPedidosRoute,
+  AppProducaoRoute: AppProducaoRoute,
   AppTendenciasRoute: AppTendenciasRoute,
   AppIndexRoute: AppIndexRoute,
   AppOportunidadesSlugRoute: AppOportunidadesSlugRoute,
