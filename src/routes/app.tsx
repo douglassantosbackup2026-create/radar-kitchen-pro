@@ -1,6 +1,5 @@
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { modulos } from "@/data/facaevenda";
-import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const Route = createFileRoute("/app")({
   component: AppLayout,
@@ -10,14 +9,11 @@ function AppLayout() {
   return (
     <div className="flex min-h-screen">
       <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar p-4 lg:flex">
-        <div className="flex items-center justify-between gap-2 px-3 py-2">
-          <Link to="/">
-            <span className="font-display text-lg font-bold">
-              Faça &amp; Venda <span className="text-gold">PRO</span>
-            </span>
-          </Link>
-          <ThemeToggle />
-        </div>
+        <Link to="/" className="px-3 py-2">
+          <span className="font-display text-lg font-bold">
+            Faça &amp; Venda <span className="text-gold">PRO</span>
+          </span>
+        </Link>
         <nav className="mt-6 flex-1 space-y-1 overflow-y-auto">
           {modulos.map((m) => (
             <Link
@@ -55,7 +51,6 @@ function AppLayout() {
             </Link>
             ))}
           </nav>
-          <ThemeToggle className="shrink-0" />
         </div>
         <main className="mx-auto max-w-5xl px-5 py-8 md:px-8 md:py-10">
           <Outlet />
