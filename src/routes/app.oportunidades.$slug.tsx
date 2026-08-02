@@ -1,22 +1,17 @@
 import { useState } from "react";
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { IndiceOportunidade } from "@/components/IndiceOportunidade";
 import { Painel } from "@/components/app/Pagina";
+import { Carregando, Erro } from "@/components/app/Estado";
 import { Selo } from "@/components/Selo";
-import { brl, oportunidades, type Oportunidade } from "@/data/facaevenda";
+import { brl } from "@/data/facaevenda";
+import { useAdicionarCompra, useOportunidade } from "@/lib/db";
 
 export const Route = createFileRoute("/app/oportunidades/$slug")({
-  loader: ({ params }) => {
-    const o = oportunidades.find((x) => x.slug === params.slug);
-    if (!o) throw notFound();
-    return { o };
-  },
-  head: ({ loaderData }) => {
-    if (!loaderData) {
-      return { meta: [{ title: "Receita não encontrada" }, { name: "robots", content: "noindex" }] };
-    }
-    const titulo = `${loaderData.o.nome} — Faça & Venda PRO`;
-    const desc = `Receita completa, custo, preço sugerido e lucro estimado de ${loaderData.o.nome}.`;
+  head: ({ params }) => {
+    const nome = params.slug.replace(/-/g, " ");
+    const titulo = `${nome} — Faça & Venda PRO`;
+    const desc = `Receita completa, custo, preço sugerido e lucro estimado de ${nome}.`;
     return {
       meta: [
         { title: titulo },
@@ -26,25 +21,28 @@ export const Route = createFileRoute("/app/oportunidades/$slug")({
       ],
     };
   },
-  notFoundComponent: NaoEncontrada,
   component: Detalhe,
 });
 
-function NaoEncontrada() {
-  return (
-    <div className="py-16 text-center">
-      <h1 className="text-2xl font-bold">Receita não encontrada</h1>
-      <Link to="/app/oportunidades" className="mt-4 inline-block text-gold underline underline-offset-4">
-        Ver todas as oportunidades
-      </Link>
-    </div>
-  );
-}
-
 function Detalhe() {
-  const { o } = Route.useLoaderData() as { o: Oportunidade };
+  const { slug } = Route.useParams();
+  const { data: o, isPending, isError } = useOportunidade(slug);
+  const adicionarCompra = useAdicionarCompra();
   const [feitos, setFeitos] = useState<string[]>([]);
   const [noPlano, setNoPlano] = useState(false);
+
+  if (isPending) return <Carregando texto="Carregando receita..." />;
+  if (isError) return <Erro />;
+  if (!o) {
+    return (
+      <div className="py-16 text-center">
+        <h1 className="text-2xl font-bold">Receita não encontrada</h1>
+        <Link to="/app/oportunidades" className="mt-4 inline-block text-gold underline underline-offset-4">
+          Ver todas as oportunidades
+        </Link>
+      </div>
+    );
+  }
 
   const margem = ((o.precoSugerido - o.custoUnitario) / o.precoSugerido) * 100;
 
@@ -143,10 +141,14 @@ function Detalhe() {
           </Painel>
           <button
             type="button"
-            onClick={() => setNoPlano(true)}
-            className="w-full rounded-xl bg-success px-4 py-3 font-semibold text-primary-foreground transition-colors hover:bg-success-hover"
+            disabled={noPlano || adicionarCompra.isPending}
+            onClick={() => {
+              o.compras.forEach((item) => adicionarCompra.mutate({ item, qtd: "" }));
+              setNoPlano(true);
+            }}
+            className="w-full rounded-xl bg-success px-4 py-3 font-semibold text-primary-foreground transition-colors hover:bg-success-hover disabled:opacity-70"
           >
-            {noPlano ? "Adicionado ao plano da semana ✓" : "Adicionar ao plano da semana"}
+            {noPlano ? "Adicionado à lista de compras ✓" : "Adicionar ao plano da semana"}
           </button>
         </div>
       </div>
