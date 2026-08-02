@@ -13,6 +13,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AssinarRouteImport } from './routes/assinar'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppBibliotecaRouteImport } from './routes/app.biblioteca'
+import { Route as AppCalculadorasRouteImport } from './routes/app.calculadoras'
+import { Route as AppCalendarioRouteImport } from './routes/app.calendario'
+import { Route as AppTendenciasRouteImport } from './routes/app.tendencias'
 import { Route as AppOportunidadesIndexRouteImport } from './routes/app.oportunidades.index'
 import { Route as AppOportunidadesSlugRouteImport } from './routes/app.oportunidades.$slug'
 
@@ -36,6 +40,26 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppBibliotecaRoute = AppBibliotecaRouteImport.update({
+  id: '/biblioteca',
+  path: '/biblioteca',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCalculadorasRoute = AppCalculadorasRouteImport.update({
+  id: '/calculadoras',
+  path: '/calculadoras',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCalendarioRoute = AppCalendarioRouteImport.update({
+  id: '/calendario',
+  path: '/calendario',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTendenciasRoute = AppTendenciasRouteImport.update({
+  id: '/tendencias',
+  path: '/tendencias',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppOportunidadesIndexRoute = AppOportunidadesIndexRouteImport.update({
   id: '/oportunidades/',
   path: '/oportunidades/',
@@ -51,6 +75,10 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/assinar': typeof AssinarRoute
+  '/app/biblioteca': typeof AppBibliotecaRoute
+  '/app/calculadoras': typeof AppCalculadorasRoute
+  '/app/calendario': typeof AppCalendarioRoute
+  '/app/tendencias': typeof AppTendenciasRoute
   '/app/': typeof AppIndexRoute
   '/app/oportunidades/$slug': typeof AppOportunidadesSlugRoute
   '/app/oportunidades/': typeof AppOportunidadesIndexRoute
@@ -58,6 +86,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/assinar': typeof AssinarRoute
+  '/app/biblioteca': typeof AppBibliotecaRoute
+  '/app/calculadoras': typeof AppCalculadorasRoute
+  '/app/calendario': typeof AppCalendarioRoute
+  '/app/tendencias': typeof AppTendenciasRoute
   '/app': typeof AppIndexRoute
   '/app/oportunidades/$slug': typeof AppOportunidadesSlugRoute
   '/app/oportunidades': typeof AppOportunidadesIndexRoute
@@ -67,6 +99,10 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/assinar': typeof AssinarRoute
+  '/app/biblioteca': typeof AppBibliotecaRoute
+  '/app/calculadoras': typeof AppCalculadorasRoute
+  '/app/calendario': typeof AppCalendarioRoute
+  '/app/tendencias': typeof AppTendenciasRoute
   '/app/': typeof AppIndexRoute
   '/app/oportunidades/$slug': typeof AppOportunidadesSlugRoute
   '/app/oportunidades/': typeof AppOportunidadesIndexRoute
@@ -77,6 +113,10 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/assinar'
+    | '/app/biblioteca'
+    | '/app/calculadoras'
+    | '/app/calendario'
+    | '/app/tendencias'
     | '/app/'
     | '/app/oportunidades/$slug'
     | '/app/oportunidades/'
@@ -84,6 +124,10 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/assinar'
+    | '/app/biblioteca'
+    | '/app/calculadoras'
+    | '/app/calendario'
+    | '/app/tendencias'
     | '/app'
     | '/app/oportunidades/$slug'
     | '/app/oportunidades'
@@ -92,6 +136,10 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/assinar'
+    | '/app/biblioteca'
+    | '/app/calculadoras'
+    | '/app/calendario'
+    | '/app/tendencias'
     | '/app/'
     | '/app/oportunidades/$slug'
     | '/app/oportunidades/'
@@ -133,6 +181,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/biblioteca': {
+      id: '/app/biblioteca'
+      path: '/biblioteca'
+      fullPath: '/app/biblioteca'
+      preLoaderRoute: typeof AppBibliotecaRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/calculadoras': {
+      id: '/app/calculadoras'
+      path: '/calculadoras'
+      fullPath: '/app/calculadoras'
+      preLoaderRoute: typeof AppCalculadorasRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/calendario': {
+      id: '/app/calendario'
+      path: '/calendario'
+      fullPath: '/app/calendario'
+      preLoaderRoute: typeof AppCalendarioRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/tendencias': {
+      id: '/app/tendencias'
+      path: '/tendencias'
+      fullPath: '/app/tendencias'
+      preLoaderRoute: typeof AppTendenciasRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/oportunidades/': {
       id: '/app/oportunidades/'
       path: '/oportunidades'
@@ -151,12 +227,20 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteChildren {
+  AppBibliotecaRoute: typeof AppBibliotecaRoute
+  AppCalculadorasRoute: typeof AppCalculadorasRoute
+  AppCalendarioRoute: typeof AppCalendarioRoute
+  AppTendenciasRoute: typeof AppTendenciasRoute
   AppIndexRoute: typeof AppIndexRoute
   AppOportunidadesSlugRoute: typeof AppOportunidadesSlugRoute
   AppOportunidadesIndexRoute: typeof AppOportunidadesIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppBibliotecaRoute: AppBibliotecaRoute,
+  AppCalculadorasRoute: AppCalculadorasRoute,
+  AppCalendarioRoute: AppCalendarioRoute,
+  AppTendenciasRoute: AppTendenciasRoute,
   AppIndexRoute: AppIndexRoute,
   AppOportunidadesSlugRoute: AppOportunidadesSlugRoute,
   AppOportunidadesIndexRoute: AppOportunidadesIndexRoute,
