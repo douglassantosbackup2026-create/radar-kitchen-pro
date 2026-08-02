@@ -238,12 +238,12 @@ export type Database = {
           destaque_do_dia: boolean
           dificuldade: number
           id: string
+          imagem_url: string | null
           indice: number
           ingredientes: string[]
           investimento: number
           lucro_estimado: number
           nome: string
-          imagem_url: string | null
           ordem: number
           por_que: string[]
           preco_sugerido: number
@@ -269,12 +269,12 @@ export type Database = {
           destaque_do_dia?: boolean
           dificuldade?: number
           id?: string
+          imagem_url?: string | null
           indice?: number
           ingredientes?: string[]
           investimento?: number
           lucro_estimado?: number
           nome: string
-          imagem_url?: string | null
           ordem?: number
           por_que?: string[]
           preco_sugerido?: number
@@ -300,12 +300,12 @@ export type Database = {
           destaque_do_dia?: boolean
           dificuldade?: number
           id?: string
+          imagem_url?: string | null
           indice?: number
           ingredientes?: string[]
           investimento?: number
           lucro_estimado?: number
           nome?: string
-          imagem_url?: string | null
           ordem?: number
           por_que?: string[]
           preco_sugerido?: number
