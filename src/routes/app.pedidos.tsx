@@ -1,9 +1,15 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { Pagina, Painel } from "@/components/app/Pagina";
 import { Carregando, Erro, Vazio } from "@/components/app/Estado";
 import { brl } from "@/data/facaevenda";
-import { useAtualizarPedido, useCriarPedido, usePedidos } from "@/lib/db";
+import {
+  useAtualizarPedido,
+  useCriarPedido,
+  useExcluirPedido,
+  usePedidos,
+} from "@/lib/db";
 
 export const Route = createFileRoute("/app/pedidos")({
   head: () => ({
@@ -23,6 +29,7 @@ function Pedidos() {
   const { data, isPending, isError } = usePedidos();
   const atualizar = useAtualizarPedido();
   const criar = useCriarPedido();
+  const excluir = useExcluirPedido();
   const [form, setForm] = useState({ cliente: "", produto: "", qtd: "1", valor: "" });
 
   return (
@@ -41,6 +48,7 @@ function Pedidos() {
                 <th className="pb-3">Valor</th>
                 <th className="pb-3">Status</th>
                 <th className="pb-3">Pago</th>
+                <th className="pb-3" />
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -54,7 +62,15 @@ function Pedidos() {
                     <select
                       value={p.status}
                       aria-label={`Status do pedido de ${p.cliente}`}
-                      onChange={(e) => atualizar.mutate({ id: p.id, status: e.target.value })}
+                      onChange={(e) =>
+                        atualizar.mutate(
+                          { id: p.id, status: e.target.value },
+                          {
+                            onSuccess: () => toast.success("Status atualizado"),
+                            onError: () => toast.error("Falha ao atualizar status"),
+                          },
+                        )
+                      }
                       className="rounded-lg border border-border bg-background px-2 py-1 text-sm outline-none focus:border-gold/50"
                     >
                       {status.map((s) => (
@@ -67,10 +83,33 @@ function Pedidos() {
                   <td className="py-3">
                     <button
                       type="button"
-                      onClick={() => atualizar.mutate({ id: p.id, pago: !p.pago })}
+                      onClick={() =>
+                        atualizar.mutate(
+                          { id: p.id, pago: !p.pago },
+                          {
+                            onSuccess: () => toast.success(p.pago ? "Marcado como não pago" : "Pago"),
+                            onError: () => toast.error("Falha ao atualizar pagamento"),
+                          },
+                        )
+                      }
                       className={p.pago ? "text-success" : "text-muted-foreground"}
                     >
                       {p.pago ? "Sim" : "Não"}
+                    </button>
+                  </td>
+                  <td className="py-3 text-right">
+                    <button
+                      type="button"
+                      disabled={excluir.isPending}
+                      onClick={() =>
+                        excluir.mutate(p.id, {
+                          onSuccess: () => toast.success("Pedido excluído"),
+                          onError: () => toast.error("Não foi possível excluir"),
+                        })
+                      }
+                      className="text-xs text-destructive hover:underline"
+                    >
+                      Excluir
                     </button>
                   </td>
                 </tr>
@@ -85,14 +124,25 @@ function Pedidos() {
           className="flex flex-wrap gap-2"
           onSubmit={(e) => {
             e.preventDefault();
-            if (!form.cliente.trim() || !form.produto.trim()) return;
-            criar.mutate({
-              cliente: form.cliente.trim(),
-              produto: form.produto.trim(),
-              qtd: Number(form.qtd) || 1,
-              valor: Number(form.valor.replace(",", ".")) || 0,
-            });
-            setForm({ cliente: "", produto: "", qtd: "1", valor: "" });
+            if (!form.cliente.trim() || !form.produto.trim()) {
+              toast.error("Informe cliente e produto.");
+              return;
+            }
+            criar.mutate(
+              {
+                cliente: form.cliente.trim(),
+                produto: form.produto.trim(),
+                qtd: Number(form.qtd) || 1,
+                valor: Number(form.valor.replace(",", ".")) || 0,
+              },
+              {
+                onSuccess: () => {
+                  toast.success("Pedido criado");
+                  setForm({ cliente: "", produto: "", qtd: "1", valor: "" });
+                },
+                onError: () => toast.error("Não foi possível criar o pedido"),
+              },
+            );
           }}
         >
           {([
@@ -112,7 +162,8 @@ function Pedidos() {
           ))}
           <button
             type="submit"
-            className="rounded-xl bg-success px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-success-hover"
+            disabled={criar.isPending}
+            className="rounded-xl bg-success px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-success-hover disabled:opacity-70"
           >
             Salvar
           </button>

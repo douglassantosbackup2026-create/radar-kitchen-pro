@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { Pagina, Painel } from "@/components/app/Pagina";
 import { Carregando, Erro, Vazio } from "@/components/app/Estado";
-import { useAdicionarCompra, useCompras, useToggleCompra } from "@/lib/db";
+import { useAdicionarCompra, useCompras, useExcluirCompra, useToggleCompra } from "@/lib/db";
 
 export const Route = createFileRoute("/app/compras")({
   head: () => ({
@@ -20,6 +21,7 @@ function Compras() {
   const { data, isPending, isError } = useCompras();
   const toggle = useToggleCompra();
   const adicionar = useAdicionarCompra();
+  const excluir = useExcluirCompra();
   const [item, setItem] = useState("");
   const [qtd, setQtd] = useState("");
 
@@ -31,19 +33,33 @@ function Compras() {
         {data && data.length === 0 && <Vazio texto="Sua lista está vazia." />}
         <ul className="divide-y divide-border">
           {data?.map((c) => (
-            <li key={c.id} className="py-3">
-              <label className="flex cursor-pointer items-center gap-3">
+            <li key={c.id} className="flex items-center gap-2 py-3">
+              <label className="flex min-w-0 flex-1 cursor-pointer items-center gap-3">
                 <input
                   type="checkbox"
                   checked={c.comprado}
                   onChange={() => toggle.mutate({ id: c.id, comprado: !c.comprado })}
                   className="h-4 w-4 accent-[var(--success)]"
                 />
-                <span className={`flex-1 ${c.comprado ? "text-muted-foreground line-through" : ""}`}>
+                <span className={`min-w-0 flex-1 truncate ${c.comprado ? "text-muted-foreground line-through" : ""}`}>
                   {c.item}
                 </span>
                 <span className="text-sm text-muted-foreground">{c.qtd}</span>
               </label>
+              <button
+                type="button"
+                aria-label={`Remover ${c.item}`}
+                disabled={excluir.isPending}
+                onClick={() =>
+                  excluir.mutate(c.id, {
+                    onSuccess: () => toast.success("Item removido"),
+                    onError: () => toast.error("Não foi possível remover"),
+                  })
+                }
+                className="shrink-0 text-xs text-destructive hover:underline"
+              >
+                Remover
+              </button>
             </li>
           ))}
         </ul>
@@ -54,9 +70,17 @@ function Compras() {
             e.preventDefault();
             const nome = item.trim();
             if (!nome) return;
-            adicionar.mutate({ item: nome, qtd: qtd.trim() });
-            setItem("");
-            setQtd("");
+            adicionar.mutate(
+              { item: nome, qtd: qtd.trim() },
+              {
+                onSuccess: () => {
+                  toast.success("Item adicionado");
+                  setItem("");
+                  setQtd("");
+                },
+                onError: () => toast.error("Não foi possível adicionar"),
+              },
+            );
           }}
         >
           <input
@@ -80,14 +104,6 @@ function Compras() {
             Adicionar
           </button>
         </form>
-
-        <button
-          type="button"
-          onClick={() => window.print()}
-          className="mt-4 rounded-xl border border-border px-4 py-2.5 text-sm font-semibold transition-colors hover:border-gold/50"
-        >
-          Imprimir lista
-        </button>
       </Painel>
     </Pagina>
   );

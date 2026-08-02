@@ -110,6 +110,57 @@ export type Database = {
         }
         Relationships: []
       }
+      desafios: {
+        Row: {
+          created_at: string
+          id: string
+          medalha: string
+          meta: number
+          ordem: number
+          produto_match: string
+          tipo: string
+          titulo: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          medalha?: string
+          meta?: number
+          ordem?: number
+          produto_match?: string
+          tipo?: string
+          titulo: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          medalha?: string
+          meta?: number
+          ordem?: number
+          produto_match?: string
+          tipo?: string
+          titulo?: string
+        }
+        Relationships: []
+      }
+      favoritos: {
+        Row: {
+          created_at: string
+          id: string
+          oportunidade_slug: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          oportunidade_slug: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          oportunidade_slug?: string
+        }
+        Relationships: []
+      }
       itens_compra: {
         Row: {
           comprado: boolean
@@ -179,6 +230,7 @@ export type Database = {
           checklist: string[]
           como_vender: string[]
           compras: string[]
+          compras_detalhe: Json
           created_at: string
           criterios: Json
           custo_unitario: number
@@ -191,6 +243,7 @@ export type Database = {
           investimento: number
           lucro_estimado: number
           nome: string
+          imagem_url: string | null
           ordem: number
           por_que: string[]
           preco_sugerido: number
@@ -208,6 +261,7 @@ export type Database = {
           checklist?: string[]
           como_vender?: string[]
           compras?: string[]
+          compras_detalhe?: Json
           created_at?: string
           criterios?: Json
           custo_unitario?: number
@@ -220,6 +274,7 @@ export type Database = {
           investimento?: number
           lucro_estimado?: number
           nome: string
+          imagem_url?: string | null
           ordem?: number
           por_que?: string[]
           preco_sugerido?: number
@@ -237,6 +292,7 @@ export type Database = {
           checklist?: string[]
           como_vender?: string[]
           compras?: string[]
+          compras_detalhe?: Json
           created_at?: string
           criterios?: Json
           custo_unitario?: number
@@ -249,6 +305,7 @@ export type Database = {
           investimento?: number
           lucro_estimado?: number
           nome?: string
+          imagem_url?: string | null
           ordem?: number
           por_que?: string[]
           preco_sugerido?: number

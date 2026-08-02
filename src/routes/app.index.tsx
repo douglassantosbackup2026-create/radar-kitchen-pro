@@ -3,7 +3,8 @@ import { Pagina, Painel } from "@/components/app/Pagina";
 import { Carregando, Erro } from "@/components/app/Estado";
 import { IndiceOportunidade } from "@/components/IndiceOportunidade";
 import { brl } from "@/data/facaevenda";
-import { useLancamentos, useOportunidades } from "@/lib/db";
+import { aniversariosProximos } from "@/lib/aniversarios";
+import { useClientes, useLancamentos, useOportunidades } from "@/lib/db";
 
 export const Route = createFileRoute("/app/")({
   head: () => ({
@@ -20,6 +21,8 @@ export const Route = createFileRoute("/app/")({
 function Inicio() {
   const { data, isPending, isError } = useOportunidades();
   const lancamentos = useLancamentos();
+  const clientes = useClientes();
+  const aniversarios = aniversariosProximos(clientes.data ?? [], { dias: 7 });
 
   const hojeISO = new Date().toISOString().slice(0, 10);
   const doDia = (lancamentos.data ?? []).filter((l) => l.dia === hojeISO);
@@ -39,9 +42,17 @@ function Inicio() {
       {o && (
         <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="overflow-hidden rounded-3xl border border-gold/30 bg-card">
-            <img src={o.imagem} alt={o.nome} width={1024} height={768} className="aspect-[16/9] w-full object-cover" />
+            <img
+              src={o.imagem}
+              alt={o.nome}
+              width={1024}
+              height={768}
+              className="aspect-[16/9] w-full object-cover"
+            />
             <div className="p-6">
-              <p className="text-xs font-semibold uppercase tracking-widest text-gold">🔥 Oportunidade do Dia</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-gold">
+                🔥 Oportunidade do Dia
+              </p>
               <h2 className="mt-2 font-display text-2xl font-bold">🥇 {o.nome}</h2>
               <dl className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
                 {[
@@ -101,6 +112,27 @@ function Inicio() {
                 </div>
               </div>
             </Painel>
+            {aniversarios.length > 0 && (
+              <Painel titulo="Aniversários da semana">
+                <ul className="space-y-2 text-sm">
+                  {aniversarios.map((a) => (
+                    <li key={a.id} className="flex items-center justify-between gap-3">
+                      <span>
+                        {a.ehHoje ? "🎂 " : ""}
+                        {a.nome}
+                      </span>
+                      <span className="text-muted-foreground">{a.ehHoje ? "hoje" : a.diaMes}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  to="/app/clientes"
+                  className="mt-4 inline-block text-sm font-medium text-gold underline underline-offset-4"
+                >
+                  Ver clientes
+                </Link>
+              </Painel>
+            )}
           </div>
         </div>
       )}

@@ -7,6 +7,8 @@ export type Selo = "Explodindo" | "Viral" | "Crescendo" | "Venda constante";
 
 export type Criterio = { nome: string; nota: number };
 
+export type CompraDetalhe = { nome: string; qtd: number; unidade: string; custo: number };
+
 export type Oportunidade = {
   slug: string;
   nome: string;
@@ -28,6 +30,7 @@ export type Oportunidade = {
   ingredientes: string[];
   preparo: string[];
   compras: string[];
+  comprasDetalhe: CompraDetalhe[];
   comoVender: string[];
   checklist: string[];
 };
@@ -79,6 +82,7 @@ export const oportunidades: Oportunidade[] = [
       "Banhe os morangos na calda e coloque sobre papel manteiga.",
     ],
     compras: ["Morango", "Açúcar cristal", "Chocolate branco", "Leite condensado", "Palitos", "Forminhas"],
+    comprasDetalhe: [],
     comoVender: [
       "Venda por encomenda com 1 dia de antecedência",
       "Combo de 6 unidades por R$45",
@@ -128,6 +132,7 @@ export const oportunidades: Oportunidade[] = [
       "Recheie e finalize com chocolate por cima.",
     ],
     compras: ["Chocolate meio amargo", "Manteiga", "Ovos", "Creme de pistache", "Massa kadaif", "Embalagem"],
+    comprasDetalhe: [],
     comoVender: ["Fatia individual R$18", "Caixa com 6 por R$95", "Ofereça degustação para lojas do bairro"],
     checklist: ["Comprar ingredientes", "Assar massa", "Preparar recheio", "Montar", "Cortar e embalar", "Entregar"],
   },
@@ -170,6 +175,7 @@ export const oportunidades: Oportunidade[] = [
       "Gele por 2 horas antes de vender.",
     ],
     compras: ["Morango", "Leite condensado", "Creme de leite", "Chocolate", "Copos 300 ml"],
+    comprasDetalhe: [],
     comoVender: ["Venda em pontos de grande circulação", "Leve 3 pague 2 no fim de semana"],
     checklist: ["Comprar ingredientes", "Preparar creme", "Montar copos", "Gelar", "Vender"],
   },
@@ -205,6 +211,7 @@ export const oportunidades: Oportunidade[] = [
       "Enrole e passe no granulado.",
     ],
     compras: ["Leite condensado", "Chocolate nobre", "Manteiga", "Granulado belga", "Forminhas"],
+    comprasDetalhe: [],
     comoVender: ["Cento por R$280", "Caixa com 12 por R$45", "Ofereça para festas de aniversário do bairro"],
     checklist: ["Comprar ingredientes", "Cozinhar massa", "Esfriar", "Enrolar", "Embalar", "Entregar"],
   },
@@ -240,46 +247,6 @@ export const categorias = [
   { nome: "Biscoitos", icone: "🍪", total: 16 },
 ];
 
-export const producaoHoje = ["Fazer Brownie", "Fazer Pudim", "Comprar Leite", "Embalar", "Entregar"];
-
-export const listaCompras = [
-  { item: "Chocolate meio amargo", qtd: "1 kg" },
-  { item: "Leite condensado", qtd: "6 latas" },
-  { item: "Manteiga", qtd: "500 g" },
-  { item: "Morango", qtd: "2 kg" },
-  { item: "Embalagem", qtd: "50 un" },
-];
-
-export const pedidos = [
-  { cliente: "Maria", produto: "Brownie", qtd: 12, status: "Entregue", pago: true },
-  { cliente: "Joana", produto: "Copo da Felicidade", qtd: 20, status: "Em produção", pago: true },
-  { cliente: "Carla", produto: "Morango do Amor", qtd: 30, status: "Pendente", pago: false },
-  { cliente: "Rita", produto: "Brigadeiro Gourmet", qtd: 100, status: "Confirmado", pago: false },
-];
-
-export const clientes = [
-  { nome: "Maria", ultimoPedido: 60, comprou: "Brownie", favorito: "Pudim", telefone: "(11) 98888-1122", aniversario: "14/09" },
-  { nome: "Joana", ultimoPedido: 300, comprou: "Copo da Felicidade", favorito: "Brownie", telefone: "(11) 97777-3344", aniversario: "02/12" },
-  { nome: "Carla", ultimoPedido: 240, comprou: "Morango do Amor", favorito: "Morango do Amor", telefone: "(11) 96666-5566", aniversario: "23/08" },
-];
-
-export const financeiro = {
-  hoje: { entrou: 320, saiu: 85, lucro: 235 },
-  mes: { faturamento: 6480, lucro: 3910, campeao: "Brownie Dubai" },
-  semanas: [
-    { semana: "S1", faturamento: 1280 },
-    { semana: "S2", faturamento: 1540 },
-    { semana: "S3", faturamento: 1720 },
-    { semana: "S4", faturamento: 1940 },
-  ],
-};
-
-export const desafios = [
-  { titulo: "Venda 20 brownies", progresso: 20, meta: 20, medalha: "🥉 Bronze" },
-  { titulo: "Venda 100 brigadeiros", progresso: 64, meta: 100, medalha: "🥈 Prata" },
-  { titulo: "Fature R$3.000 no mês", progresso: 1940, meta: 3000, medalha: "🥇 Ouro" },
-];
-
 export const modulos = [
   { to: "/app", label: "Início", icone: "🏠" },
   { to: "/app/oportunidades", label: "Oportunidades", icone: "🔥" },
@@ -294,6 +261,13 @@ export const modulos = [
   { to: "/app/financeiro", label: "Financeiro", icone: "📈" },
   { to: "/app/favoritos", label: "Favoritos", icone: "⭐" },
   { to: "/app/desafios", label: "Desafios", icone: "🏆" },
+] as const;
+
+export const atalhosMobile = [
+  { to: "/app", label: "Início", icone: "🏠" },
+  { to: "/app/oportunidades", label: "Oportunidades", icone: "🔥" },
+  { to: "/app/pedidos", label: "Pedidos", icone: "📝" },
+  { to: "/app/financeiro", label: "Financeiro", icone: "📈" },
 ] as const;
 
 export const brl = (valor: number) =>

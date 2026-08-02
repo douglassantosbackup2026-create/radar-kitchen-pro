@@ -2,8 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Pagina, Painel } from "@/components/app/Pagina";
 import { Carregando, Erro } from "@/components/app/Estado";
 import { Selo } from "@/components/Selo";
-import { maisVendidas, type Selo as SeloTipo } from "@/data/facaevenda";
-import { useDatas, useTendencias } from "@/lib/db";
+import type { Selo as SeloTipo } from "@/data/facaevenda";
+import { useDatas, useOportunidades, useTendencias } from "@/lib/db";
 
 export const Route = createFileRoute("/app/tendencias")({
   head: () => ({
@@ -20,6 +20,10 @@ export const Route = createFileRoute("/app/tendencias")({
 function Tendencias() {
   const tendencias = useTendencias();
   const datas = useDatas();
+  const oportunidades = useOportunidades();
+  const maisVendidas = [...(oportunidades.data?.lista ?? [])]
+    .sort((a, b) => b.indice - a.indice)
+    .slice(0, 5);
 
   return (
     <Pagina titulo="Tendências" descricao="Essa semana, segundo o Radar Faça & Venda™.">
@@ -40,11 +44,14 @@ function Tendencias() {
           </ul>
         </Painel>
         <Painel titulo="🥇 Mais vendidas">
+          {oportunidades.isPending && <Carregando />}
+          {oportunidades.isError && <Erro />}
           <ol className="space-y-3 text-sm">
             {maisVendidas.map((m, i) => (
-              <li key={m} className="flex gap-3">
+              <li key={m.slug} className="flex gap-3">
                 <span className="w-5 text-muted-foreground">{i + 1}.</span>
-                {m}
+                <span className="flex-1">{m.nome}</span>
+                <span className="tabular-nums text-gold">{m.indice}</span>
               </li>
             ))}
           </ol>

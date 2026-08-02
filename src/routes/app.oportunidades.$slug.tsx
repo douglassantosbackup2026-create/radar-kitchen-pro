@@ -1,11 +1,18 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { IndiceOportunidade } from "@/components/IndiceOportunidade";
 import { Painel } from "@/components/app/Pagina";
 import { Carregando, Erro } from "@/components/app/Estado";
 import { Selo } from "@/components/Selo";
 import { brl } from "@/data/facaevenda";
-import { useAdicionarCompra, useOportunidade } from "@/lib/db";
+import {
+  useAdicionarCompras,
+  useFavoritos,
+  useOportunidade,
+  useToggleFavorito,
+} from "@/lib/db";
+import { itensCompras, formatQtdUnidade } from "@/lib/calculadora";
 
 export const Route = createFileRoute("/app/oportunidades/$slug")({
   head: ({ params }) => {
@@ -27,9 +34,11 @@ export const Route = createFileRoute("/app/oportunidades/$slug")({
 function Detalhe() {
   const { slug } = Route.useParams();
   const { data: o, isPending, isError } = useOportunidade(slug);
-  const adicionarCompra = useAdicionarCompra();
+  const adicionarCompras = useAdicionarCompras();
+  const favoritos = useFavoritos();
+  const toggleFavorito = useToggleFavorito();
   const [feitos, setFeitos] = useState<string[]>([]);
-  const [noPlano, setNoPlano] = useState(false);
+  const isFavorito = (favoritos.data ?? []).some((f) => f.oportunidade_slug === slug);
 
   if (isPending) return <Carregando texto="Carregando receita..." />;
   if (isError) return <Erro />;
@@ -45,6 +54,7 @@ function Detalhe() {
   }
 
   const margem = ((o.precoSugerido - o.custoUnitario) / o.precoSugerido) * 100;
+  const listaCompras = itensCompras(o);
 
   return (
     <article>
@@ -54,6 +64,28 @@ function Detalhe() {
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <h1 className="text-3xl font-bold">{o.nome}</h1>
         <Selo selo={o.selo} />
+        <button
+          type="button"
+          disabled={toggleFavorito.isPending}
+          onClick={() => {
+            toggleFavorito.mutate(o.slug, {
+              onSuccess: (r) =>
+                toast.success(r.favorito ? "Adicionado aos favoritos" : "Removido dos favoritos"),
+              onError: () => toast.error("Não foi possível atualizar o favorito."),
+            });
+          }}
+          className="rounded-xl border border-border px-3 py-1.5 text-sm font-medium transition-colors hover:border-gold/40"
+          aria-label={isFavorito ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+        >
+          {isFavorito ? "★ Favorito" : "☆ Favoritar"}
+        </button>
+        <Link
+          to="/app/calculadoras"
+          search={{ produto: o.slug }}
+          className="rounded-xl border border-gold/40 px-3 py-1.5 text-sm font-medium text-gold transition-colors hover:bg-gold/10"
+        >
+          Abrir na calculadora
+        </Link>
       </div>
 
       <img
@@ -112,8 +144,14 @@ function Detalhe() {
           <IndiceOportunidade indice={o.indice} criterios={o.criterios} />
           <Painel titulo="Lista de compras">
             <ul className="space-y-2 text-sm text-muted-foreground">
-              {o.compras.map((c) => (
-                <li key={c}>🛒 {c}</li>
+              {listaCompras.map((c) => (
+                <li key={c.nome} className="flex justify-between gap-3">
+                  <span>
+                    🛒 {c.nome}{" "}
+                    <span className="text-xs opacity-70">({formatQtdUnidade(c)})</span>
+                  </span>
+                  <span className="tabular-nums">{brl(c.custo)}</span>
+                </li>
               ))}
             </ul>
           </Painel>
@@ -141,14 +179,30 @@ function Detalhe() {
           </Painel>
           <button
             type="button"
-            disabled={noPlano || adicionarCompra.isPending}
+            disabled={adicionarCompras.isPending}
             onClick={() => {
-              o.compras.forEach((item) => adicionarCompra.mutate({ item, qtd: "" }));
-              setNoPlano(true);
+              adicionarCompras.mutate(
+                listaCompras.map((c) => ({ item: c.nome, qtd: "" })),
+                {
+                  onSuccess: (r) => {
+                    if (r.adicionados === 0) {
+                      toast.message("Já estava na lista", {
+                        description: "Esses itens já existiam em Compras.",
+                      });
+                    } else {
+                      toast.success(
+                        `${r.adicionados} item(ns) adicionados` +
+                          (r.ignorados > 0 ? ` · ${r.ignorados} já existiam` : ""),
+                      );
+                    }
+                  },
+                  onError: () => toast.error("Não foi possível atualizar as compras."),
+                },
+              );
             }}
             className="w-full rounded-xl bg-success px-4 py-3 font-semibold text-primary-foreground transition-colors hover:bg-success-hover disabled:opacity-70"
           >
-            {noPlano ? "Adicionado à lista de compras ✓" : "Adicionar ao plano da semana"}
+            {adicionarCompras.isPending ? "Adicionando..." : "Adicionar ao plano da semana"}
           </button>
         </div>
       </div>

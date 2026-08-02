@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { Pagina, Painel } from "@/components/app/Pagina";
 import { Carregando, Erro } from "@/components/app/Estado";
 import { brl } from "@/data/facaevenda";
-import { useLancamentos, type LancamentoRow } from "@/lib/db";
+import { useCriarLancamento, useLancamentos, type LancamentoRow } from "@/lib/db";
 
 export const Route = createFileRoute("/app/financeiro")({
   head: () => ({
@@ -54,8 +56,15 @@ function resumir(lancamentos: LancamentoRow[]) {
 
 function Financeiro() {
   const { data, isPending, isError } = useLancamentos();
+  const criar = useCriarLancamento();
   const f = resumir(data ?? []);
   const maior = Math.max(1, ...f.semanas.map((s) => s.faturamento));
+  const [form, setForm] = useState({
+    tipo: "entrada",
+    descricao: "",
+    valor: "",
+    produto: "",
+  });
 
   return (
     <Pagina titulo="Financeiro" descricao="O número que importa: quanto sobrou.">
@@ -106,6 +115,74 @@ function Financeiro() {
           </dl>
         </Painel>
       </div>
+
+      <Painel titulo="Novo lançamento" className="mt-6">
+        <form
+          className="flex flex-wrap gap-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const valor = Number(form.valor.replace(",", ".")) || 0;
+            if (valor <= 0) {
+              toast.error("Informe um valor maior que zero.");
+              return;
+            }
+            criar.mutate(
+              {
+                tipo: form.tipo,
+                descricao: form.descricao.trim(),
+                valor,
+                produto: form.produto.trim(),
+                dia: new Date().toISOString().slice(0, 10),
+              },
+              {
+                onSuccess: () => {
+                  toast.success("Lançamento registrado");
+                  setForm({ tipo: "entrada", descricao: "", valor: "", produto: "" });
+                },
+                onError: () => toast.error("Não foi possível salvar o lançamento"),
+              },
+            );
+          }}
+        >
+          <select
+            value={form.tipo}
+            onChange={(e) => setForm((f) => ({ ...f, tipo: e.target.value }))}
+            aria-label="Tipo"
+            className="rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-gold/50"
+          >
+            <option value="entrada">Entrada</option>
+            <option value="saida">Saída</option>
+          </select>
+          <input
+            value={form.descricao}
+            onChange={(e) => setForm((f) => ({ ...f, descricao: e.target.value }))}
+            placeholder="Descrição"
+            aria-label="Descrição"
+            className="min-w-40 flex-1 rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-gold/50"
+          />
+          <input
+            value={form.produto}
+            onChange={(e) => setForm((f) => ({ ...f, produto: e.target.value }))}
+            placeholder="Produto"
+            aria-label="Produto"
+            className="min-w-32 flex-1 rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-gold/50"
+          />
+          <input
+            value={form.valor}
+            onChange={(e) => setForm((f) => ({ ...f, valor: e.target.value }))}
+            placeholder="Valor"
+            aria-label="Valor"
+            className="w-28 rounded-xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-gold/50"
+          />
+          <button
+            type="submit"
+            disabled={criar.isPending}
+            className="rounded-xl bg-success px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-success-hover disabled:opacity-70"
+          >
+            Registrar
+          </button>
+        </form>
+      </Painel>
     </Pagina>
   );
 }

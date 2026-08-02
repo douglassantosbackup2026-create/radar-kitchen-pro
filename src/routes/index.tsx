@@ -1,14 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CalculadoraPreco } from "@/components/CalculadoraPreco";
+import { CalculadoraPrecoDemo } from "@/components/CalculadoraPreco";
 import { IndiceOportunidade } from "@/components/IndiceOportunidade";
 import { Selo } from "@/components/Selo";
 import {
   brl,
-  calendario,
-  maisVendidas,
-  oportunidadeDoDia,
-  tendencias,
+  calendario as calendarioSeed,
+  maisVendidas as maisVendidasSeed,
+  oportunidadeDoDia as oportunidadeSeed,
+  tendencias as tendenciasSeed,
 } from "@/data/facaevenda";
+import { useDatas, useOportunidades, useTendencias } from "@/lib/db";
 
 const TITULO = "Faça & Venda PRO — Descubra hoje o que vender amanhã";
 const DESC =
@@ -82,6 +83,22 @@ const faq = [
 ];
 
 function Landing() {
+  const oportunidades = useOportunidades();
+  const tendenciasQ = useTendencias();
+  const datasQ = useDatas();
+
+  const oportunidadeDoDia = oportunidades.data?.doDia ?? oportunidadeSeed;
+  const tendencias =
+    tendenciasQ.data?.map((t) => ({ nome: t.nome, nota: t.nota, selo: t.selo })) ?? tendenciasSeed;
+  const maisVendidas =
+    oportunidades.data?.lista
+      .slice()
+      .sort((a, b) => b.indice - a.indice)
+      .slice(0, 5)
+      .map((o) => o.nome) ?? maisVendidasSeed;
+  const calendario =
+    datasQ.data?.map((d) => ({ mes: d.mes, data: d.data, itens: d.itens })) ?? calendarioSeed;
+
   return (
     <main>
       {/* HERO */}
@@ -126,15 +143,15 @@ function Landing() {
             <dl className="mt-5 grid grid-cols-3 gap-4 text-sm">
               <div>
                 <dt className="text-xs text-muted-foreground">Demanda</dt>
-                <dd className="mt-1 text-gold">★★★★★</dd>
+                <dd className="mt-1 text-gold">{"★".repeat(oportunidadeDoDia.demanda)}</dd>
               </div>
               <div>
                 <dt className="text-xs text-muted-foreground">Lucro</dt>
-                <dd className="mt-1 font-semibold text-gold">R$380</dd>
+                <dd className="mt-1 font-semibold text-gold">{brl(oportunidadeDoDia.lucroEstimado)}</dd>
               </div>
               <div>
                 <dt className="text-xs text-muted-foreground">Investimento</dt>
-                <dd className="mt-1 font-semibold">R$72</dd>
+                <dd className="mt-1 font-semibold">{brl(oportunidadeDoDia.investimento)}</dd>
               </div>
             </dl>
             <Link
@@ -290,7 +307,7 @@ function Landing() {
       <Secao>
         <Titulo>Nunca mais fique em dúvida sobre quanto cobrar.</Titulo>
         <div className="mt-10">
-          <CalculadoraPreco />
+          <CalculadoraPrecoDemo />
         </div>
       </Secao>
 

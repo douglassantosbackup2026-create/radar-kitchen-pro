@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { Pagina, Painel } from "@/components/app/Pagina";
 import { Carregando, Erro, Vazio } from "@/components/app/Estado";
-import { useAdicionarTarefa, useTarefas, useToggleTarefa } from "@/lib/db";
+import { useAdicionarTarefa, useExcluirTarefa, useTarefas, useToggleTarefa } from "@/lib/db";
 
 export const Route = createFileRoute("/app/producao")({
   head: () => ({
@@ -20,6 +21,7 @@ function Producao() {
   const { data, isPending, isError } = useTarefas();
   const toggle = useToggleTarefa();
   const adicionar = useAdicionarTarefa();
+  const excluir = useExcluirTarefa();
   const [novo, setNovo] = useState("");
 
   const feitos = data?.filter((t) => t.feito).length ?? 0;
@@ -32,16 +34,32 @@ function Producao() {
         {data && data.length === 0 && <Vazio texto="Nenhuma tarefa hoje. Adicione a primeira." />}
         <ul className="space-y-3">
           {data?.map((t) => (
-            <li key={t.id}>
-              <label className="flex cursor-pointer items-center gap-3">
+            <li key={t.id} className="flex items-center gap-2">
+              <label className="flex min-w-0 flex-1 cursor-pointer items-center gap-3">
                 <input
                   type="checkbox"
                   checked={t.feito}
                   onChange={() => toggle.mutate({ id: t.id, feito: !t.feito })}
                   className="h-4 w-4 accent-[var(--success)]"
                 />
-                <span className={t.feito ? "text-muted-foreground line-through" : ""}>{t.titulo}</span>
+                <span className={`truncate ${t.feito ? "text-muted-foreground line-through" : ""}`}>
+                  {t.titulo}
+                </span>
               </label>
+              <button
+                type="button"
+                aria-label={`Remover ${t.titulo}`}
+                disabled={excluir.isPending}
+                onClick={() =>
+                  excluir.mutate(t.id, {
+                    onSuccess: () => toast.success("Tarefa removida"),
+                    onError: () => toast.error("Não foi possível remover"),
+                  })
+                }
+                className="shrink-0 text-xs text-destructive hover:underline"
+              >
+                Remover
+              </button>
             </li>
           ))}
         </ul>
@@ -52,8 +70,13 @@ function Producao() {
             e.preventDefault();
             const titulo = novo.trim();
             if (!titulo) return;
-            adicionar.mutate(titulo);
-            setNovo("");
+            adicionar.mutate(titulo, {
+              onSuccess: () => {
+                toast.success("Tarefa adicionada");
+                setNovo("");
+              },
+              onError: () => toast.error("Não foi possível adicionar"),
+            });
           }}
         >
           <input

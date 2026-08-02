@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { Database } from "@/integrations/supabase/types";
-import type { Criterio, Oportunidade, Selo } from "@/data/facaevenda";
+import type { Database, Json } from "@/integrations/supabase/types";
+import type { CompraDetalhe, Criterio, Oportunidade, Selo } from "@/data/facaevenda";
+import { parseRendimento } from "@/lib/calculadora";
+import { useRealtimeTable } from "@/lib/realtime";
 import morangoImg from "@/assets/morango-do-amor.jpg";
 import brownieImg from "@/assets/brownie-dubai.jpg";
 import copoImg from "@/assets/copo-da-felicidade.jpg";
@@ -16,6 +18,15 @@ export type LancamentoRow = Tables["lancamentos"]["Row"];
 export type TendenciaRow = Tables["tendencias"]["Row"];
 export type DataRow = Tables["datas_comemorativas"]["Row"];
 export type CategoriaRow = Tables["categorias"]["Row"];
+export type FavoritoRow = Tables["favoritos"]["Row"];
+export type DesafioRow = Tables["desafios"]["Row"];
+
+export type DesafioComProgresso = DesafioRow & { progresso: number };
+
+export type AdicionarComprasResultado = {
+  adicionados: number;
+  ignorados: number;
+};
 
 const imagens: Record<string, string> = {
   "morango-do-amor": morangoImg,
@@ -28,13 +39,55 @@ export function imagemDe(slug: string) {
   return imagens[slug] ?? morangoImg;
 }
 
+function parseComprasDetalhe(raw: Json, compras: string[], custoUnitario: number, rendimento: string): CompraDetalhe[] {
+  if (Array.isArray(raw) && raw.length > 0) {
+    const parsed: CompraDetalhe[] = [];
+    for (const item of raw) {
+      if (!item || typeof item !== "object" || Array.isArray(item)) continue;
+      const nome = typeof item["nome"] === "string" ? item["nome"] : null;
+      const custo = typeof item["custo"] === "number" ? item["custo"] : Number(item["custo"]);
+      const qtd = typeof item["qtd"] === "number" ? item["qtd"] : Number(item["qtd"] ?? 1);
+      const unidade = typeof item["unidade"] === "string" && item["unidade"] ? item["unidade"] : "un";
+      if (nome && Number.isFinite(custo)) {
+        parsed.push({
+          nome,
+          qtd: Number.isFinite(qtd) && qtd > 0 ? qtd : 1,
+          unidade,
+          custo,
+        });
+      }
+    }
+    if (parsed.length > 0) return parsed;
+  }
+  if (compras.length === 0) {
+    return [{ nome: "Ingredientes", qtd: 1, unidade: "un", custo: custoUnitario * parseRendimento(rendimento) }];
+  }
+  const total = custoUnitario * parseRendimento(rendimento);
+  const base = Math.round((total / compras.length) * 100) / 100;
+  return compras.map((nome, i) => ({
+    nome,
+    qtd: 1,
+    unidade: "un",
+    custo:
+      i === compras.length - 1
+        ? Math.max(0, Math.round((total - base * (compras.length - 1)) * 100) / 100)
+        : base,
+  }));
+}
+
 function paraOportunidade(row: Tables["oportunidades"]["Row"]): Oportunidade {
+  const comprasDetalhe = parseComprasDetalhe(
+    row.compras_detalhe,
+    row.compras,
+    Number(row.custo_unitario),
+    row.rendimento,
+  );
   return {
     slug: row.slug,
     nome: row.nome,
     categoria: row.categoria,
     selo: row.selo as Selo,
-    imagem: imagemDe(row.slug),
+    imagem: row.imagem_url || imagemDe(row.slug),
     indice: row.indice,
     criterios: (Array.isArray(row.criterios) ? row.criterios : []) as unknown as Criterio[],
     lucroEstimado: Number(row.lucro_estimado),
@@ -49,7 +102,8 @@ function paraOportunidade(row: Tables["oportunidades"]["Row"]): Oportunidade {
     porQue: row.por_que,
     ingredientes: row.ingredientes,
     preparo: row.preparo,
-    compras: row.compras,
+    compras: row.compras.length > 0 ? row.compras : comprasDetalhe.map((c) => c.nome),
+    comprasDetalhe,
     comoVender: row.como_vender,
     checklist: row.checklist,
   };
@@ -128,6 +182,7 @@ export function useCategorias() {
 }
 
 export function useClientes() {
+  useRealtimeTable("clientes", ["clientes"]);
   return useQuery({
     queryKey: ["clientes"],
     queryFn: async () => {
@@ -139,6 +194,7 @@ export function useClientes() {
 }
 
 export function usePedidos() {
+  useRealtimeTable("pedidos", ["pedidos"]);
   return useQuery({
     queryKey: ["pedidos"],
     queryFn: async () => {
@@ -153,6 +209,7 @@ export function usePedidos() {
 }
 
 export function useTarefas() {
+  useRealtimeTable("tarefas_producao", ["tarefas"]);
   return useQuery({
     queryKey: ["tarefas"],
     queryFn: async () => {
@@ -164,6 +221,7 @@ export function useTarefas() {
 }
 
 export function useCompras() {
+  useRealtimeTable("itens_compra", ["compras"]);
   return useQuery({
     queryKey: ["compras"],
     queryFn: async () => {
@@ -175,6 +233,7 @@ export function useCompras() {
 }
 
 export function useLancamentos() {
+  useRealtimeTable("lancamentos", ["lancamentos"]);
   return useQuery({
     queryKey: ["lancamentos"],
     queryFn: async () => {
@@ -188,9 +247,83 @@ export function useLancamentos() {
   });
 }
 
+export function useFavoritos() {
+  return useQuery({
+    queryKey: ["favoritos"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("favoritos")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+export function useDesafiosComProgresso() {
+  return useQuery({
+    queryKey: ["desafios-progresso"],
+    queryFn: async (): Promise<DesafioComProgresso[]> => {
+      const [desafiosRes, pedidosRes, lancamentosRes] = await Promise.all([
+        supabase.from("desafios").select("*").order("ordem"),
+        supabase.from("pedidos").select("produto,qtd"),
+        supabase.from("lancamentos").select("tipo,valor,dia"),
+      ]);
+      if (desafiosRes.error) throw desafiosRes.error;
+      if (pedidosRes.error) throw pedidosRes.error;
+      if (lancamentosRes.error) throw lancamentosRes.error;
+
+      const mesISO = new Date().toISOString().slice(0, 7);
+      const pedidos = pedidosRes.data ?? [];
+      const lancamentos = lancamentosRes.data ?? [];
+
+      return (desafiosRes.data ?? []).map((d) => {
+        let progresso = 0;
+        if (d.tipo === "faturamento") {
+          progresso = lancamentos
+            .filter((l) => l.tipo === "entrada" && l.dia.startsWith(mesISO))
+            .reduce((t, l) => t + Number(l.valor), 0);
+        } else {
+          const match = d.produto_match.trim().toLowerCase();
+          progresso = pedidos
+            .filter((p) => match.length > 0 && p.produto.toLowerCase().includes(match))
+            .reduce((t, p) => t + Number(p.qtd), 0);
+        }
+        return { ...d, progresso };
+      });
+    },
+  });
+}
+
 function useInvalidar(chave: string) {
   const qc = useQueryClient();
   return () => qc.invalidateQueries({ queryKey: [chave] });
+}
+
+export function useToggleFavorito() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (slug: string) => {
+      const { data: existente, error: errSelect } = await supabase
+        .from("favoritos")
+        .select("id")
+        .eq("oportunidade_slug", slug)
+        .maybeSingle();
+      if (errSelect) throw errSelect;
+      if (existente) {
+        const { error } = await supabase.from("favoritos").delete().eq("id", existente.id);
+        if (error) throw error;
+        return { slug, favorito: false as const };
+      }
+      const { error } = await supabase.from("favoritos").insert({ oportunidade_slug: slug });
+      if (error) throw error;
+      return { slug, favorito: true as const };
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["favoritos"] });
+    },
+  });
 }
 
 export function useToggleTarefa() {
@@ -210,6 +343,29 @@ export function useAdicionarTarefa() {
     mutationFn: async (titulo: string) => {
       const { error } = await supabase.from("tarefas_producao").insert({ titulo });
       if (error) throw error;
+    },
+    onSuccess: invalidar,
+  });
+}
+
+export function useAdicionarTarefas() {
+  const invalidar = useInvalidar("tarefas");
+  return useMutation({
+    mutationFn: async (titulos: string[]) => {
+      if (titulos.length === 0) return { adicionados: 0 };
+      const { data: existentes, error: errSelect } = await supabase
+        .from("tarefas_producao")
+        .select("titulo");
+      if (errSelect) throw errSelect;
+      const jaTem = new Set((existentes ?? []).map((t) => t.titulo.trim().toLowerCase()));
+      const novos = titulos
+        .map((t) => t.trim())
+        .filter((t) => t.length > 0 && !jaTem.has(t.toLowerCase()))
+        .map((titulo, i) => ({ titulo, ordem: i }));
+      if (novos.length === 0) return { adicionados: 0, ignorados: titulos.length };
+      const { error } = await supabase.from("tarefas_producao").insert(novos);
+      if (error) throw error;
+      return { adicionados: novos.length, ignorados: titulos.length - novos.length };
     },
     onSuccess: invalidar,
   });
@@ -237,6 +393,28 @@ export function useAdicionarCompra() {
   });
 }
 
+export function useAdicionarCompras() {
+  const invalidar = useInvalidar("compras");
+  return useMutation({
+    mutationFn: async (itens: { item: string; qtd: string }[]): Promise<AdicionarComprasResultado> => {
+      if (itens.length === 0) return { adicionados: 0, ignorados: 0 };
+      const { data: existentes, error: errSelect } = await supabase.from("itens_compra").select("item");
+      if (errSelect) throw errSelect;
+      const jaTem = new Set((existentes ?? []).map((c) => c.item.trim().toLowerCase()));
+      const novos = itens.filter((i) => {
+        const key = i.item.trim().toLowerCase();
+        return key.length > 0 && !jaTem.has(key);
+      });
+      const ignorados = itens.length - novos.length;
+      if (novos.length === 0) return { adicionados: 0, ignorados };
+      const { error } = await supabase.from("itens_compra").insert(novos);
+      if (error) throw error;
+      return { adicionados: novos.length, ignorados };
+    },
+    onSuccess: invalidar,
+  });
+}
+
 export function useAtualizarPedido() {
   const invalidar = useInvalidar("pedidos");
   return useMutation({
@@ -248,22 +426,97 @@ export function useAtualizarPedido() {
   });
 }
 
+export function useExcluirPedido() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("pedidos").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["pedidos"] });
+      void qc.invalidateQueries({ queryKey: ["desafios-progresso"] });
+    },
+  });
+}
+
 export function useCriarPedido() {
-  const invalidar = useInvalidar("pedidos");
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: async (pedido: Tables["pedidos"]["Insert"]) => {
       const { error } = await supabase.from("pedidos").insert(pedido);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["pedidos"] });
+      void qc.invalidateQueries({ queryKey: ["desafios-progresso"] });
+    },
+  });
+}
+
+export function useCriarLancamento() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (l: Tables["lancamentos"]["Insert"]) => {
+      const { error } = await supabase.from("lancamentos").insert(l);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["lancamentos"] });
+      void qc.invalidateQueries({ queryKey: ["desafios-progresso"] });
+    },
+  });
+}
+
+export function useExcluirCompra() {
+  const invalidar = useInvalidar("compras");
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("itens_compra").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: invalidar,
   });
 }
 
-export function useCriarLancamento() {
-  const invalidar = useInvalidar("lancamentos");
+export function useExcluirTarefa() {
+  const invalidar = useInvalidar("tarefas");
   return useMutation({
-    mutationFn: async (l: Tables["lancamentos"]["Insert"]) => {
-      const { error } = await supabase.from("lancamentos").insert(l);
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("tarefas_producao").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: invalidar,
+  });
+}
+
+export function useCriarCliente() {
+  const invalidar = useInvalidar("clientes");
+  return useMutation({
+    mutationFn: async (cliente: Tables["clientes"]["Insert"]) => {
+      const { error } = await supabase.from("clientes").insert(cliente);
+      if (error) throw error;
+    },
+    onSuccess: invalidar,
+  });
+}
+
+export function useAtualizarCliente() {
+  const invalidar = useInvalidar("clientes");
+  return useMutation({
+    mutationFn: async ({ id, ...campos }: { id: string } & Tables["clientes"]["Update"]) => {
+      const { error } = await supabase.from("clientes").update(campos).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: invalidar,
+  });
+}
+
+export function useExcluirCliente() {
+  const invalidar = useInvalidar("clientes");
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("clientes").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: invalidar,

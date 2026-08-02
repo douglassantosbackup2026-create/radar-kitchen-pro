@@ -268,4 +268,4 @@ INSERT INTO public.itens_compra (item, qtd, ordem) VALUES
 
 INSERT INTO public.lancamentos (tipo, descricao, valor, produto) VALUES
 ('entrada','Venda de brownies',320,'Brownie Dubai'),
-('saida','Compra de ingredientes',85,'');
+('saida','Compra de ingredientes',85,'');;
