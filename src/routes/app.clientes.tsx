@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Pagina, Painel } from "@/components/app/Pagina";
-import { brl, clientes } from "@/data/facaevenda";
+import { Carregando, Erro, Vazio } from "@/components/app/Estado";
+import { brl } from "@/data/facaevenda";
+import { useClientes } from "@/lib/db";
 
 export const Route = createFileRoute("/app/clientes")({
   head: () => ({
@@ -15,16 +17,21 @@ export const Route = createFileRoute("/app/clientes")({
 });
 
 function Clientes() {
+  const { data, isPending, isError } = useClientes();
+
   return (
     <Pagina titulo="Clientes" descricao="No aniversário, você recebe uma notificação para oferecer.">
+      {isPending && <Carregando />}
+      {isError && <Erro />}
+      {data && data.length === 0 && <Vazio texto="Nenhum cliente cadastrado ainda." />}
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {clientes.map((c) => (
-          <Painel key={c.nome}>
+        {data?.map((c) => (
+          <Painel key={c.id}>
             <h2 className="font-display text-xl font-semibold">{c.nome}</h2>
             <dl className="mt-4 space-y-2 text-sm">
               <div className="flex justify-between">
                 <dt className="text-muted-foreground">Último pedido</dt>
-                <dd className="font-semibold">{brl(c.ultimoPedido)}</dd>
+                <dd className="font-semibold">{brl(Number(c.ultimo_pedido))}</dd>
               </div>
               <div className="flex justify-between">
                 <dt className="text-muted-foreground">Comprou</dt>
