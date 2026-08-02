@@ -5,9 +5,7 @@ export type Tema = "light" | "dark";
 export const TEMA_KEY = "fv-theme";
 
 export function aplicarTema(tema: Tema) {
-  const root = document.documentElement;
-  root.classList.toggle("dark", tema === "dark");
-  root.style.colorScheme = tema;
+  document.documentElement.setAttribute("data-theme", tema);
 }
 
 export function lerTema(): Tema {
@@ -17,7 +15,7 @@ export function lerTema(): Tema {
 }
 
 /** Script inline aplicado antes da hidratação para evitar flash de tema. */
-export const temaScript = `(function(){try{var t=localStorage.getItem("${TEMA_KEY}");if(t!=="light"){t="dark"}document.documentElement.classList.toggle("dark",t==="dark");document.documentElement.style.colorScheme=t}catch(e){document.documentElement.classList.add("dark")}})();`;
+export const temaScript = `(function(){try{var t=localStorage.getItem("${TEMA_KEY}");if(t!=="light"){t="dark"}document.documentElement.setAttribute("data-theme",t)}catch(e){document.documentElement.setAttribute("data-theme","dark")}})();`;
 
 export function useTema() {
   const [tema, setTema] = useState<Tema>("dark");
