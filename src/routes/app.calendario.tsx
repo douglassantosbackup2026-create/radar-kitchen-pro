@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Pagina } from "@/components/app/Pagina";
 import { Carregando, Erro } from "@/components/app/Estado";
-import { useDatas } from "@/lib/db";
+import { useDatas, useOportunidades } from "@/lib/db";
 
 export const Route = createFileRoute("/app/calendario")({
   head: () => ({
@@ -15,8 +15,19 @@ export const Route = createFileRoute("/app/calendario")({
   component: Calendario,
 });
 
+function matchSlug(item: string, lista: { nome: string; slug: string }[]) {
+  const needle = item.trim().toLowerCase();
+  return (
+    lista.find((o) => o.nome.toLowerCase() === needle) ??
+    lista.find((o) => o.nome.toLowerCase().includes(needle) || needle.includes(o.nome.toLowerCase())) ??
+    lista.find((o) => o.slug.includes(needle.replace(/\s+/g, "-")))
+  );
+}
+
 function Calendario() {
   const { data, isPending, isError } = useDatas();
+  const oportunidades = useOportunidades();
+  const lista = oportunidades.data?.lista ?? [];
 
   return (
     <Pagina titulo="Calendário Comercial" descricao="Você nunca fica perdida. Prepare-se com antecedência.">
@@ -31,11 +42,27 @@ function Calendario() {
               <h2 className="mt-1 font-display text-xl font-semibold">{c.data}</h2>
               <p className="mt-3 text-xs uppercase tracking-widest text-muted-foreground">Recomendamos</p>
               <ul className="mt-2 flex flex-wrap gap-2">
-                {c.itens.map((i) => (
-                  <li key={i} className="rounded-full bg-secondary px-3 py-1 text-sm">
-                    {i}
-                  </li>
-                ))}
+                {c.itens.map((i) => {
+                  const match = matchSlug(i, lista);
+                  if (match) {
+                    return (
+                      <li key={i}>
+                        <Link
+                          to="/app/oportunidades/$slug"
+                          params={{ slug: match.slug }}
+                          className="inline-block rounded-full bg-secondary px-3 py-1 text-sm transition-colors hover:bg-gold/20 hover:text-gold"
+                        >
+                          {i}
+                        </Link>
+                      </li>
+                    );
+                  }
+                  return (
+                    <li key={i} className="rounded-full bg-secondary px-3 py-1 text-sm">
+                      {i}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </li>

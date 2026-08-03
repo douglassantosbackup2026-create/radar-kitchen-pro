@@ -29,12 +29,21 @@ test.describe("desafios", () => {
 
     await page.goto("/app/financeiro");
     await expect(page.getByRole("heading", { name: "Financeiro" })).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByText("Entrou hoje")).toBeVisible({ timeout: 30_000 });
+    // Evita fill apagado por remount/hidratação
+    await page.waitForTimeout(500);
+
     await page.getByLabel("Tipo").selectOption("entrada");
-    await page.getByLabel("Descrição").fill(id);
-    await page.getByLabel("Produto").fill("Brownie Dubai");
-    await page.getByLabel("Valor").fill("1");
+    const desc = page.getByLabel("Descrição");
+    await desc.click();
+    await desc.pressSequentially(id, { delay: 15 });
+    await page.getByLabel("Produto").click();
+    await page.getByLabel("Produto").pressSequentially("Brownie Dubai", { delay: 10 });
+    await page.getByLabel("Valor").click();
+    await page.getByLabel("Valor").pressSequentially("1", { delay: 10 });
+    await expect(desc).toHaveValue(id);
     await page.getByRole("button", { name: "Registrar" }).click();
-    await expectToast(page, "Lançamento registrado");
+    await expect(desc).toHaveValue("", { timeout: 20_000 });
 
     await page.goto("/app/desafios");
     const depois = await progressoDesafio(page, DESAFIO_FAT);

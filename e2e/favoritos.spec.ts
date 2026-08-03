@@ -11,7 +11,7 @@ test.describe("favoritos", () => {
     if (slug) await removeFavorito(slug);
   });
 
-  test("favoritar e desfavoritar oportunidade", async ({ page }) => {
+  test("favoritar, filtrar e desfavoritar", async ({ page }) => {
     await page.goto("/app/oportunidades");
     await expect(page.getByRole("heading", { name: "Oportunidades" })).toBeVisible({
       timeout: 30_000,
@@ -29,7 +29,7 @@ test.describe("favoritos", () => {
     const card = page.locator("div.group").filter({ has: botaoAdd }).first();
     nome = (await card.locator("h3").textContent())?.trim() ?? null;
     const href = await card.locator('a[href*="/app/oportunidades/"]').getAttribute("href");
-    slug = href?.split("/").pop() ?? null;
+    slug = href?.split("/").pop()?.split("?")[0] ?? null;
     expect(slug).toBeTruthy();
     expect(nome).toBeTruthy();
 
@@ -37,16 +37,18 @@ test.describe("favoritos", () => {
     await expectToast(page, "Adicionado aos favoritos");
 
     await page.goto("/app/favoritos");
-    await expect(page.getByRole("heading", { name: "Favoritos" })).toBeVisible({ timeout: 30_000 });
+    await expect(page).toHaveURL(/fav=/, { timeout: 15_000 });
+    await expect(page.getByRole("heading", { name: nome!, level: 3 })).toBeVisible({
+      timeout: 15_000,
+    });
+
     const favCard = page
       .locator("div.group")
       .filter({ has: page.getByRole("heading", { name: nome!, level: 3 }) });
-    await expect(favCard).toBeVisible({ timeout: 15_000 });
-
     await favCard.getByLabel("Remover dos favoritos").click();
     await expectToast(page, "Removido dos favoritos");
-    await expect(
-      page.getByRole("heading", { name: nome!, level: 3 }),
-    ).toHaveCount(0, { timeout: 15_000 });
+    await expect(page.getByRole("heading", { name: nome!, level: 3 })).toHaveCount(0, {
+      timeout: 15_000,
+    });
   });
 });

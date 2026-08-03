@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
-import { atalhosMobile, modulos } from "@/data/facaevenda";
+import { atalhosMobile, navGrupos } from "@/data/facaevenda";
 import {
   Sheet,
   SheetContent,
@@ -13,6 +13,33 @@ export const Route = createFileRoute("/app")({
   component: AppLayout,
 });
 
+function NavLink({
+  to,
+  label,
+  icone,
+  onNavigate,
+  className = "",
+}: {
+  to: string;
+  label: string;
+  icone: string;
+  onNavigate?: () => void;
+  className?: string;
+}) {
+  return (
+    <Link
+      to={to}
+      activeOptions={{ exact: to === "/app" }}
+      activeProps={{ className: "bg-sidebar-accent text-gold" }}
+      onClick={onNavigate}
+      className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-sidebar-foreground transition-colors hover:bg-sidebar-accent ${className}`}
+    >
+      <span aria-hidden>{icone}</span>
+      {label}
+    </Link>
+  );
+}
+
 function AppLayout() {
   const [maisAberto, setMaisAberto] = useState(false);
 
@@ -24,18 +51,18 @@ function AppLayout() {
             Faça &amp; Venda <span className="text-gold">PRO</span>
           </span>
         </Link>
-        <nav className="mt-6 flex-1 space-y-1 overflow-y-auto">
-          {modulos.map((m) => (
-            <Link
-              key={m.to}
-              to={m.to}
-              activeOptions={{ exact: m.to === "/app" }}
-              activeProps={{ className: "bg-sidebar-accent text-gold" }}
-              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-sidebar-foreground transition-colors hover:bg-sidebar-accent"
-            >
-              <span aria-hidden>{m.icone}</span>
-              {m.label}
-            </Link>
+        <nav className="mt-6 flex-1 space-y-5 overflow-y-auto">
+          {navGrupos.map((grupo) => (
+            <div key={grupo.titulo}>
+              <p className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                {grupo.titulo}
+              </p>
+              <div className="space-y-1">
+                {grupo.itens.map((m) => (
+                  <NavLink key={m.to} to={m.to} label={m.label} icone={m.icone} />
+                ))}
+              </div>
+            </div>
           ))}
         </nav>
         <Link
@@ -86,19 +113,25 @@ function AppLayout() {
                 <SheetHeader>
                   <SheetTitle className="font-display text-left">Menu</SheetTitle>
                 </SheetHeader>
-                <nav className="mt-4 grid gap-1">
-                  {modulos.map((m) => (
-                    <Link
-                      key={m.to}
-                      to={m.to}
-                      activeOptions={{ exact: m.to === "/app" }}
-                      activeProps={{ className: "bg-secondary text-gold" }}
-                      onClick={() => setMaisAberto(false)}
-                      className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm transition-colors hover:bg-secondary"
-                    >
-                      <span aria-hidden>{m.icone}</span>
-                      {m.label}
-                    </Link>
+                <nav className="mt-4 space-y-5">
+                  {navGrupos.map((grupo) => (
+                    <div key={grupo.titulo}>
+                      <p className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                        {grupo.titulo}
+                      </p>
+                      <div className="grid gap-1">
+                        {grupo.itens.map((m) => (
+                          <NavLink
+                            key={m.to}
+                            to={m.to}
+                            label={m.label}
+                            icone={m.icone}
+                            onNavigate={() => setMaisAberto(false)}
+                            className="py-3"
+                          />
+                        ))}
+                      </div>
+                    </div>
                   ))}
                 </nav>
                 <Link

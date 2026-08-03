@@ -416,13 +416,49 @@ export function useAdicionarCompras() {
 }
 
 export function useAtualizarPedido() {
-  const invalidar = useInvalidar("pedidos");
+  const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, ...campos }: { id: string } & Tables["pedidos"]["Update"]) => {
+    mutationFn: async ({
+      id,
+      ...campos
+    }: { id: string } & Tables["pedidos"]["Update"]): Promise<{ lancamentoCriado: boolean }> => {
+      let pedidoAntes: Tables["pedidos"]["Row"] | null = null;
+      if (campos.pago === true) {
+        const { data, error: errSelect } = await supabase.from("pedidos").select("*").eq("id", id).single();
+        if (errSelect) throw errSelect;
+        pedidoAntes = data;
+      }
+
       const { error } = await supabase.from("pedidos").update(campos).eq("id", id);
       if (error) throw error;
+
+      if (campos.pago === true && pedidoAntes && !pedidoAntes.pago) {
+        const { data: existente, error: errExist } = await supabase
+          .from("lancamentos")
+          .select("id")
+          .eq("pedido_id", id)
+          .maybeSingle();
+        if (errExist) throw errExist;
+        if (!existente) {
+          const { error: errLanc } = await supabase.from("lancamentos").insert({
+            tipo: "entrada",
+            descricao: `Pedido ${pedidoAntes.cliente}`,
+            produto: pedidoAntes.produto,
+            valor: Number(pedidoAntes.valor),
+            dia: new Date().toISOString().slice(0, 10),
+            pedido_id: id,
+          });
+          if (errLanc) throw errLanc;
+          return { lancamentoCriado: true };
+        }
+      }
+      return { lancamentoCriado: false };
     },
-    onSuccess: invalidar,
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["pedidos"] });
+      void qc.invalidateQueries({ queryKey: ["lancamentos"] });
+      void qc.invalidateQueries({ queryKey: ["desafios-progresso"] });
+    },
   });
 }
 

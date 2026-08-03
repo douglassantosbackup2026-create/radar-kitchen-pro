@@ -87,6 +87,7 @@ export async function cleanupByPrefix(prefix: string) {
     db.from("clientes").delete().like("nome", like),
     db.from("pedidos").delete().like("cliente", like),
     db.from("lancamentos").delete().like("descricao", like),
+    db.from("lancamentos").delete().like("descricao", `Pedido ${like}`),
     db.from("itens_compra").delete().like("item", like),
     db.from("tarefas_producao").delete().like("titulo", like),
   ]);

@@ -606,15 +606,19 @@ Não é um curso.
 
 HERO
 
-Descubra hoje o que vender amanhã.
+Qualquer pessoa pode descobrir o que vender hoje — e precificar com lucro — sem passar horas caçando receita.
 
-Todos os dias nossa equipe seleciona as receitas que estão fazendo mais sucesso em vendas e entrega tudo pronto para você começar: receita completa, custo, preço de venda, lucro estimado e plano de produção.
+Entenda como empreendedoras que ainda se sentiam perdidas na cozinha estão organizando produção, pedidos e caixa com uma oportunidade clara por dia.
 
-Você não precisa procurar. Só escolher e vender.
+Abra a plataforma e aprenda 4 coisas:
+1. Por que procurar “o que vender” no Google só te deixa mais confusa no dia seguinte.
+2. Como pegar uma oportunidade, ver custo, preço e lucro — e montar a lista de compras em minutos.
+3. Por que receita sem precificação e sem plano de produção vira prejuízo disfarçado de sucesso.
+4. Por que “fazer o que todo mundo posta” sem índice de oportunidade é furada.
 
-[ QUERO ASSINAR ]
+[ Quero descobrir o que vender hoje ]
 
-⭐⭐⭐⭐⭐ Mais de X cozinheiras já utilizam a plataforma.
+Garantia 7 dias · Acesso imediato · Compra 100% segura · Foco vender todo dia
 
 HERO VISUAL
 
@@ -649,25 +653,11 @@ Não:
 
 SEÇÃO 2
 
-Enquanto milhares de pessoas passam horas procurando receitas...
+Pouco esforço para decidir. Mais energia para produzir e vender.
 
-Você abre a plataforma e encontra exatamente o que vale a pena produzir hoje.
+A oportunidade do dia já vem com receita, custo, preço sugerido e lucro estimado. Você não inventa o cardápio do zero — escolhe, monta a produção e registra o pedido.
 
-✔ Receita
-
-✔ Ingredientes
-
-✔ Custo
-
-✔ Preço
-
-✔ Lucro
-
-✔ Lista de compras
-
-✔ Checklist
-
-Tudo em um único lugar.
+[ Quero vender com clareza agora ]
 
 SEÇÃO 3
 
@@ -867,15 +857,11 @@ SEÇÃO 11
 
 Quanto vale nunca mais perder tempo procurando o que vender?
 
-Plano Mensal.
+Mensal — R$47
 
-R$47
+Semestral — R$127 (Mais escolhido)
 
-ou
-
-Plano Anual.
-
-R$297
+Anual — R$197
 
 SEÇÃO 12
 
@@ -1169,11 +1155,11 @@ Só um grid.
 
 Planos
 
-Mensal
+Mensal — R$47
 
-Semestral
+Semestral — R$127
 
-Anual
+Anual — R$197
 
 Garantia
 

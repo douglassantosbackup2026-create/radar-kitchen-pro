@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Pagina } from "@/components/app/Pagina";
 import { Carregando, Erro } from "@/components/app/Estado";
-import { useCategorias, useOportunidades } from "@/lib/db";
+import { useCategorias } from "@/lib/db";
 
 export const Route = createFileRoute("/app/biblioteca")({
   head: () => ({
@@ -17,46 +17,27 @@ export const Route = createFileRoute("/app/biblioteca")({
 
 function Biblioteca() {
   const categorias = useCategorias();
-  const receitas = useOportunidades();
 
   return (
-    <Pagina titulo="Biblioteca" descricao="Todas as receitas. Organizadas por categoria, nunca em PDF.">
+    <Pagina titulo="Biblioteca" descricao="Escolha uma categoria para ver as oportunidades.">
       {categorias.isError && <Erro />}
       {categorias.isPending && <Carregando />}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {categorias.data?.map((c) => (
-          <div key={c.id} className="rounded-2xl border border-border bg-card p-5">
+          <Link
+            key={c.id}
+            to="/app/oportunidades"
+            search={{ cat: c.nome }}
+            className="rounded-2xl border border-border bg-card p-5 transition-colors hover:border-gold/40"
+          >
             <span className="text-2xl" aria-hidden>
               {c.icone}
             </span>
             <p className="mt-3 font-display font-semibold">{c.nome}</p>
             <p className="text-sm text-muted-foreground">{c.total} receitas</p>
-          </div>
+          </Link>
         ))}
       </div>
-
-      <h2 className="mt-10 text-xs font-semibold uppercase tracking-widest text-gold">
-        Adicionadas recentemente
-      </h2>
-      {receitas.isPending && <Carregando />}
-      <ul className="mt-4 divide-y divide-border rounded-2xl border border-border bg-card">
-        {receitas.data?.lista.map((o) => (
-          <li key={o.slug}>
-            <Link
-              to="/app/oportunidades/$slug"
-              params={{ slug: o.slug }}
-              className="flex items-center gap-4 p-4 transition-colors hover:bg-secondary"
-            >
-              <img src={o.imagem} alt="" loading="lazy" className="h-12 w-12 rounded-lg object-cover" />
-              <span className="flex-1">
-                <span className="block font-medium">{o.nome}</span>
-                <span className="block text-sm text-muted-foreground">{o.categoria}</span>
-              </span>
-              <span className="text-sm text-gold">{o.indice}/100</span>
-            </Link>
-          </li>
-        ))}
-      </ul>
     </Pagina>
   );
 }

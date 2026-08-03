@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Pagina, Painel } from "@/components/app/Pagina";
@@ -11,7 +11,12 @@ import {
   usePedidos,
 } from "@/lib/db";
 
+type Search = { cliente?: string | undefined };
+
 export const Route = createFileRoute("/app/pedidos")({
+  validateSearch: (search: Record<string, unknown>): Search => ({
+    cliente: typeof search["cliente"] === "string" && search["cliente"].length > 0 ? search["cliente"] : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Pedidos — Faça & Venda PRO" },
@@ -26,11 +31,23 @@ export const Route = createFileRoute("/app/pedidos")({
 const status = ["Pendente", "Em produção", "Pronto", "Entregue"];
 
 function Pedidos() {
+  const { cliente: clienteSearch } = Route.useSearch();
   const { data, isPending, isError } = usePedidos();
   const atualizar = useAtualizarPedido();
   const criar = useCriarPedido();
   const excluir = useExcluirPedido();
-  const [form, setForm] = useState({ cliente: "", produto: "", qtd: "1", valor: "" });
+  const [form, setForm] = useState({
+    cliente: clienteSearch ?? "",
+    produto: "",
+    qtd: "1",
+    valor: "",
+  });
+
+  useEffect(() => {
+    if (clienteSearch) {
+      setForm((f) => ({ ...f, cliente: clienteSearch }));
+    }
+  }, [clienteSearch]);
 
   return (
     <Pagina titulo="Pedidos" descricao="Muito simples. Quem pediu, o quê, quanto e se já pagou.">
@@ -87,7 +104,15 @@ function Pedidos() {
                         atualizar.mutate(
                           { id: p.id, pago: !p.pago },
                           {
-                            onSuccess: () => toast.success(p.pago ? "Marcado como não pago" : "Pago"),
+                            onSuccess: (r) => {
+                              if (p.pago) {
+                                toast.success("Marcado como não pago");
+                              } else if (r.lancamentoCriado) {
+                                toast.success("Pago · entrada registrada");
+                              } else {
+                                toast.success("Pago");
+                              }
+                            },
                             onError: () => toast.error("Falha ao atualizar pagamento"),
                           },
                         )

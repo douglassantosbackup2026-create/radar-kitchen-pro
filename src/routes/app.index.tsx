@@ -4,7 +4,15 @@ import { Carregando, Erro } from "@/components/app/Estado";
 import { IndiceOportunidade } from "@/components/IndiceOportunidade";
 import { brl } from "@/data/facaevenda";
 import { aniversariosProximos } from "@/lib/aniversarios";
-import { useClientes, useLancamentos, useOportunidades } from "@/lib/db";
+import {
+  useClientes,
+  useCompras,
+  useDesafiosComProgresso,
+  useLancamentos,
+  useOportunidades,
+  usePedidos,
+  useTarefas,
+} from "@/lib/db";
 
 export const Route = createFileRoute("/app/")({
   head: () => ({
@@ -22,6 +30,10 @@ function Inicio() {
   const { data, isPending, isError } = useOportunidades();
   const lancamentos = useLancamentos();
   const clientes = useClientes();
+  const compras = useCompras();
+  const tarefas = useTarefas();
+  const pedidos = usePedidos();
+  const desafios = useDesafiosComProgresso();
   const aniversarios = aniversariosProximos(clientes.data ?? [], { dias: 7 });
 
   const hojeISO = new Date().toISOString().slice(0, 10);
@@ -34,6 +46,15 @@ function Inicio() {
 
   const o = data?.doDia;
   const semana = data?.daSemana;
+
+  const comprasPendentes = (compras.data ?? []).filter((c) => !c.comprado).length;
+  const tarefasPendentes = (tarefas.data ?? []).filter((t) => !t.feito).length;
+  const pedidosNaoPagos = (pedidos.data ?? []).filter((p) => !p.pago).length;
+
+  const desafioAberto = (desafios.data ?? []).find((d) => {
+    const meta = Number(d.meta) || 1;
+    return d.progresso / meta < 1;
+  });
 
   return (
     <Pagina titulo="Bom dia 👋" descricao="Hoje recomendamos uma oportunidade. Só uma.">
@@ -79,6 +100,54 @@ function Inicio() {
 
           <div className="space-y-6">
             <IndiceOportunidade indice={o.indice} criterios={o.criterios} />
+            <Painel titulo="Próximos passos">
+              <ul className="space-y-3 text-sm">
+                <li className="flex items-center justify-between gap-3">
+                  <Link to="/app/compras" className="font-medium text-gold underline underline-offset-4">
+                    Compras
+                  </Link>
+                  <span className="text-muted-foreground">
+                    {comprasPendentes} pendente{comprasPendentes === 1 ? "" : "s"}
+                  </span>
+                </li>
+                <li className="flex items-center justify-between gap-3">
+                  <Link to="/app/producao" className="font-medium text-gold underline underline-offset-4">
+                    Produção
+                  </Link>
+                  <span className="text-muted-foreground">
+                    {tarefasPendentes} aberta{tarefasPendentes === 1 ? "" : "s"}
+                  </span>
+                </li>
+                <li className="flex items-center justify-between gap-3">
+                  <Link to="/app/pedidos" className="font-medium text-gold underline underline-offset-4">
+                    Pedidos
+                  </Link>
+                  <span className="text-muted-foreground">
+                    {pedidosNaoPagos} sem pagamento
+                  </span>
+                </li>
+              </ul>
+            </Painel>
+            {desafioAberto && (
+              <Painel titulo="Desafio em andamento">
+                <p className="font-display font-semibold">{desafioAberto.titulo}</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {desafioAberto.tipo === "faturamento"
+                    ? brl(desafioAberto.progresso)
+                    : Math.round(desafioAberto.progresso)}{" "}
+                  de{" "}
+                  {desafioAberto.tipo === "faturamento"
+                    ? brl(Number(desafioAberto.meta))
+                    : Number(desafioAberto.meta)}
+                </p>
+                <Link
+                  to="/app/desafios"
+                  className="mt-3 inline-block text-sm font-medium text-gold underline underline-offset-4"
+                >
+                  Ver desafios
+                </Link>
+              </Painel>
+            )}
             {semana && (
               <Painel titulo="🔥 Receita da semana">
                 <h3 className="font-display text-xl font-semibold">{semana.nome}</h3>

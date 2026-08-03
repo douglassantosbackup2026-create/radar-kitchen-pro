@@ -247,21 +247,41 @@ export const categorias = [
   { nome: "Biscoitos", icone: "🍪", total: 16 },
 ];
 
-export const modulos = [
-  { to: "/app", label: "Início", icone: "🏠" },
-  { to: "/app/oportunidades", label: "Oportunidades", icone: "🔥" },
-  { to: "/app/tendencias", label: "Tendências", icone: "📈" },
-  { to: "/app/calendario", label: "Calendário", icone: "📅" },
-  { to: "/app/biblioteca", label: "Biblioteca", icone: "📖" },
-  { to: "/app/calculadoras", label: "Calculadoras", icone: "💰" },
-  { to: "/app/producao", label: "Produção", icone: "📦" },
-  { to: "/app/compras", label: "Compras", icone: "🛒" },
-  { to: "/app/pedidos", label: "Pedidos", icone: "📝" },
-  { to: "/app/clientes", label: "Clientes", icone: "👥" },
-  { to: "/app/financeiro", label: "Financeiro", icone: "📈" },
-  { to: "/app/favoritos", label: "Favoritos", icone: "⭐" },
-  { to: "/app/desafios", label: "Desafios", icone: "🏆" },
-] as const;
+export const navGrupos = [
+  {
+    titulo: "Decidir",
+    itens: [
+      { to: "/app", label: "Início", icone: "🏠" },
+      { to: "/app/oportunidades", label: "Oportunidades", icone: "🔥" },
+      { to: "/app/tendencias", label: "Tendências", icone: "📈" },
+      { to: "/app/calendario", label: "Calendário", icone: "📅" },
+    ],
+  },
+  {
+    titulo: "Executar",
+    itens: [
+      { to: "/app/calculadoras", label: "Calculadoras", icone: "💰" },
+      { to: "/app/producao", label: "Produção", icone: "📦" },
+      { to: "/app/compras", label: "Compras", icone: "🛒" },
+      { to: "/app/pedidos", label: "Pedidos", icone: "📝" },
+    ],
+  },
+  {
+    titulo: "Crescer",
+    itens: [
+      { to: "/app/clientes", label: "Clientes", icone: "👥" },
+      { to: "/app/financeiro", label: "Financeiro", icone: "📈" },
+      { to: "/app/desafios", label: "Desafios", icone: "🏆" },
+    ],
+  },
+] as const satisfies ReadonlyArray<{
+  titulo: string;
+  itens: ReadonlyArray<{ to: string; label: string; icone: string }>;
+}>;
+
+/** Flat list for Mais sheet / compatibility */
+export const modulos = navGrupos.flatMap((g) => g.itens.map((i) => ({ ...i })));
+
 
 export const atalhosMobile = [
   { to: "/app", label: "Início", icone: "🏠" },

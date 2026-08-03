@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Pagina, Painel } from "@/components/app/Pagina";
 import { Carregando, Erro, Vazio } from "@/components/app/Estado";
@@ -144,7 +144,14 @@ function Clientes() {
             <p className="mt-4 text-sm text-gold">
               🎂 Aniversário em {c.aniversario || "—"}
             </p>
-            <div className="mt-4 flex gap-2">
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Link
+                to="/app/pedidos"
+                search={{ cliente: c.nome }}
+                className="rounded-lg border border-gold/40 px-3 py-1.5 text-xs font-medium text-gold hover:bg-gold/10"
+              >
+                Novo pedido
+              </Link>
               <button
                 type="button"
                 onClick={() => preencher(c)}

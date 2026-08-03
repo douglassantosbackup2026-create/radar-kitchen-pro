@@ -8,6 +8,8 @@ import { Selo } from "@/components/Selo";
 import { brl } from "@/data/facaevenda";
 import {
   useAdicionarCompras,
+  useAdicionarTarefas,
+  useCriarPedido,
   useFavoritos,
   useOportunidade,
   useToggleFavorito,
@@ -31,13 +33,18 @@ export const Route = createFileRoute("/app/oportunidades/$slug")({
   component: Detalhe,
 });
 
+const PASSOS = ["Precificar", "Compras", "Produção", "Pedido"] as const;
+
 function Detalhe() {
   const { slug } = Route.useParams();
   const { data: o, isPending, isError } = useOportunidade(slug);
   const adicionarCompras = useAdicionarCompras();
+  const adicionarTarefas = useAdicionarTarefas();
+  const criarPedido = useCriarPedido();
   const favoritos = useFavoritos();
   const toggleFavorito = useToggleFavorito();
-  const [feitos, setFeitos] = useState<string[]>([]);
+  const [passo, setPasso] = useState(1);
+  const [pedidoForm, setPedidoForm] = useState({ cliente: "", qtd: "1" });
   const isFavorito = (favoritos.data ?? []).some((f) => f.oportunidade_slug === slug);
 
   if (isPending) return <Carregando texto="Carregando receita..." />;
@@ -55,6 +62,8 @@ function Detalhe() {
 
   const margem = ((o.precoSugerido - o.custoUnitario) / o.precoSugerido) * 100;
   const listaCompras = itensCompras(o);
+  const qtd = Math.max(1, Number(pedidoForm.qtd) || 1);
+  const valorPedido = Math.round(o.precoSugerido * qtd * 100) / 100;
 
   return (
     <article>
@@ -112,6 +121,223 @@ function Detalhe() {
         ))}
       </div>
 
+      <Painel titulo="Começar agora" className="mt-6">
+        <ol className="mb-6 flex flex-wrap gap-2">
+          {PASSOS.map((label, i) => {
+            const n = i + 1;
+            const ativo = passo === n;
+            return (
+              <li key={label}>
+                <button
+                  type="button"
+                  onClick={() => setPasso(n)}
+                  className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+                    ativo ? "bg-gold text-primary-foreground" : "bg-secondary text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {n}. {label}
+                </button>
+              </li>
+            );
+          })}
+        </ol>
+
+        {passo === 1 && (
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Preço sugerido <span className="font-semibold text-foreground">{brl(o.precoSugerido)}</span> ·
+              custo {brl(o.custoUnitario)} · margem {margem.toFixed(0)}%.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Link
+                to="/app/calculadoras"
+                search={{ produto: o.slug }}
+                className="rounded-xl bg-success px-5 py-3 text-sm font-semibold text-primary-foreground hover:bg-success-hover"
+              >
+                Abrir calculadora
+              </Link>
+              <button
+                type="button"
+                onClick={() => setPasso(2)}
+                className="rounded-xl border border-border px-5 py-3 text-sm font-semibold hover:border-gold/40"
+              >
+                Próximo: Compras
+              </button>
+            </div>
+          </div>
+        )}
+
+        {passo === 2 && (
+          <div className="space-y-4">
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              {listaCompras.map((c) => (
+                <li key={c.nome} className="flex justify-between gap-3">
+                  <span>
+                    {c.nome}{" "}
+                    <span className="text-xs opacity-70">({formatQtdUnidade(c)})</span>
+                  </span>
+                  <span className="tabular-nums">{brl(c.custo)}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                disabled={adicionarCompras.isPending || listaCompras.length === 0}
+                onClick={() => {
+                  adicionarCompras.mutate(
+                    listaCompras.map((c) => ({
+                      item: c.nome,
+                      qtd: formatQtdUnidade(c),
+                    })),
+                    {
+                      onSuccess: (r) => {
+                        if (r.adicionados === 0) {
+                          toast.message("Já estava na lista", {
+                            description: "Esses itens já existiam em Compras.",
+                          });
+                        } else {
+                          toast.success(
+                            `${r.adicionados} item(ns) adicionados` +
+                              (r.ignorados > 0 ? ` · ${r.ignorados} já existiam` : ""),
+                          );
+                        }
+                        setPasso(3);
+                      },
+                      onError: () => toast.error("Não foi possível atualizar as compras."),
+                    },
+                  );
+                }}
+                className="rounded-xl bg-success px-5 py-3 text-sm font-semibold text-primary-foreground hover:bg-success-hover disabled:opacity-70"
+              >
+                {adicionarCompras.isPending ? "Enviando..." : "Enviar para Compras"}
+              </button>
+              <Link to="/app/compras" className="text-sm font-medium text-gold underline underline-offset-4">
+                Ver compras
+              </Link>
+              <button
+                type="button"
+                onClick={() => setPasso(3)}
+                className="text-sm text-muted-foreground underline underline-offset-4"
+              >
+                Pular
+              </button>
+            </div>
+          </div>
+        )}
+
+        {passo === 3 && (
+          <div className="space-y-4">
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              {o.checklist.map((c) => (
+                <li key={c}>• {c}</li>
+              ))}
+            </ul>
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                disabled={adicionarTarefas.isPending || o.checklist.length === 0}
+                onClick={() => {
+                  adicionarTarefas.mutate(o.checklist, {
+                    onSuccess: (r) => {
+                      if (!r || r.adicionados === 0) {
+                        toast.message("Produção já montada", {
+                          description: "As tarefas do checklist já estavam na lista.",
+                        });
+                      } else {
+                        toast.success(`${r.adicionados} tarefa(s) na produção`);
+                      }
+                      setPasso(4);
+                    },
+                    onError: () => toast.error("Não foi possível montar a produção."),
+                  });
+                }}
+                className="rounded-xl bg-success px-5 py-3 text-sm font-semibold text-primary-foreground hover:bg-success-hover disabled:opacity-70"
+              >
+                {adicionarTarefas.isPending ? "Montando..." : "Montar produção"}
+              </button>
+              <Link to="/app/producao" className="text-sm font-medium text-gold underline underline-offset-4">
+                Ver produção
+              </Link>
+              <button
+                type="button"
+                onClick={() => setPasso(4)}
+                className="text-sm text-muted-foreground underline underline-offset-4"
+              >
+                Pular
+              </button>
+            </div>
+          </div>
+        )}
+
+        {passo === 4 && (
+          <form
+            className="flex flex-wrap items-end gap-3"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!pedidoForm.cliente.trim()) {
+                toast.error("Informe o nome do cliente.");
+                return;
+              }
+              criarPedido.mutate(
+                {
+                  cliente: pedidoForm.cliente.trim(),
+                  produto: o.nome,
+                  qtd,
+                  valor: valorPedido,
+                  status: "Pendente",
+                  pago: false,
+                },
+                {
+                  onSuccess: () => {
+                    toast.success("Pedido criado");
+                    setPedidoForm({ cliente: "", qtd: "1" });
+                  },
+                  onError: () => toast.error("Não foi possível criar o pedido."),
+                },
+              );
+            }}
+          >
+            <label className="min-w-[10rem] flex-1 text-sm">
+              <span className="text-muted-foreground">Cliente</span>
+              <input
+                value={pedidoForm.cliente}
+                onChange={(e) => setPedidoForm((f) => ({ ...f, cliente: e.target.value }))}
+                className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 outline-none focus:border-gold/50"
+                placeholder="Nome"
+              />
+            </label>
+            <label className="w-24 text-sm">
+              <span className="text-muted-foreground">Qtd</span>
+              <input
+                type="number"
+                min={1}
+                value={pedidoForm.qtd}
+                onChange={(e) => setPedidoForm((f) => ({ ...f, qtd: e.target.value }))}
+                className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 outline-none focus:border-gold/50"
+              />
+            </label>
+            <div className="text-sm">
+              <p className="text-muted-foreground">Valor</p>
+              <p className="mt-1 font-display text-lg font-semibold">{brl(valorPedido)}</p>
+            </div>
+            <button
+              type="submit"
+              disabled={criarPedido.isPending}
+              className="rounded-xl bg-success px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-success-hover disabled:opacity-70"
+            >
+              {criarPedido.isPending ? "Salvando..." : "Criar pedido"}
+            </button>
+            <Link
+              to="/app/pedidos"
+              className="self-center text-sm font-medium text-gold underline underline-offset-4"
+            >
+              Ver pedidos
+            </Link>
+          </form>
+        )}
+      </Painel>
+
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
         <div className="space-y-6">
           <Painel titulo="Ingredientes">
@@ -156,54 +382,15 @@ function Detalhe() {
             </ul>
           </Painel>
           <Painel titulo="Checklist de produção">
-            <ul className="space-y-2.5">
-              {o.checklist.map((c) => {
-                const feito = feitos.includes(c);
-                return (
-                  <li key={c}>
-                    <label className="flex cursor-pointer items-center gap-3 text-sm">
-                      <input
-                        type="checkbox"
-                        checked={feito}
-                        onChange={() =>
-                          setFeitos((f) => (feito ? f.filter((x) => x !== c) : [...f, c]))
-                        }
-                        className="h-4 w-4 accent-[var(--success)]"
-                      />
-                      <span className={feito ? "text-muted-foreground line-through" : ""}>{c}</span>
-                    </label>
-                  </li>
-                );
-              })}
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              {o.checklist.map((c) => (
+                <li key={c}>• {c}</li>
+              ))}
             </ul>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Use o passo Produção acima para enviar estas tarefas à lista do dia.
+            </p>
           </Painel>
-          <button
-            type="button"
-            disabled={adicionarCompras.isPending}
-            onClick={() => {
-              adicionarCompras.mutate(
-                listaCompras.map((c) => ({ item: c.nome, qtd: "" })),
-                {
-                  onSuccess: (r) => {
-                    if (r.adicionados === 0) {
-                      toast.message("Já estava na lista", {
-                        description: "Esses itens já existiam em Compras.",
-                      });
-                    } else {
-                      toast.success(
-                        `${r.adicionados} item(ns) adicionados` +
-                          (r.ignorados > 0 ? ` · ${r.ignorados} já existiam` : ""),
-                      );
-                    }
-                  },
-                  onError: () => toast.error("Não foi possível atualizar as compras."),
-                },
-              );
-            }}
-            className="w-full rounded-xl bg-success px-4 py-3 font-semibold text-primary-foreground transition-colors hover:bg-success-hover disabled:opacity-70"
-          >
-            {adicionarCompras.isPending ? "Adicionando..." : "Adicionar ao plano da semana"}
-          </button>
         </div>
       </div>
     </article>

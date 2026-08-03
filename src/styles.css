@@ -64,6 +64,57 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --animate-marquee: marquee 28s linear infinite;
+  --animate-hero-notif-live: hero-notif-pop 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes hero-notif-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-18px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.hero-phone__wallpaper {
+  background:
+    radial-gradient(ellipse 120% 80% at 50% -10%, oklch(0.72 0.19 45) 0%, transparent 55%),
+    linear-gradient(180deg, oklch(0.55 0.2 35) 0%, oklch(0.28 0.1 25) 45%, oklch(0.12 0.03 20) 100%);
+}
+
+.hero-phone__wallpaper::after {
+  content: "";
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  bottom: 12%;
+  height: 40%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, oklch(0.7 0.18 50 / 45%) 0%, transparent 70%);
+  filter: blur(8px);
+  pointer-events: none;
+}
+
+.hero-phone__notif-live {
+  animation: hero-notif-pop 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-phone__notif-live {
+    animation: none;
+  }
 }
 
 :root {
