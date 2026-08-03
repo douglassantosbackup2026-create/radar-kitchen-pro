@@ -382,6 +382,28 @@ export function useToggleCompra() {
   });
 }
 
+export function useAtualizarCompra() {
+  const invalidar = useInvalidar("compras");
+  return useMutation({
+    mutationFn: async ({
+      id,
+      item,
+      qtd,
+    }: {
+      id: string;
+      item?: string;
+      qtd?: string;
+    }) => {
+      const campos: Tables["itens_compra"]["Update"] = {};
+      if (item !== undefined) campos.item = item;
+      if (qtd !== undefined) campos.qtd = qtd;
+      const { error } = await supabase.from("itens_compra").update(campos).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: invalidar,
+  });
+}
+
 export function useAdicionarCompra() {
   const invalidar = useInvalidar("compras");
   return useMutation({

@@ -11,6 +11,14 @@ export function margemCatalogo(o: Oportunidade): number {
   return Math.min(85, Math.max(20, Math.round(m)));
 }
 
+/** Margem % a partir do preço de venda e custo unitário (1–85). */
+export function margemFromPreco(custoUnitario: number, preco: number): number {
+  if (preco <= 0) return 1;
+  if (custoUnitario <= 0) return 85;
+  const m = (1 - custoUnitario / preco) * 100;
+  return Math.min(85, Math.max(1, Math.round(m)));
+}
+
 export function formatQtdUnidade(item: CompraDetalhe): string {
   return `${item.qtd} ${item.unidade}`.trim();
 }
