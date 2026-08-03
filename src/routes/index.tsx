@@ -1,28 +1,21 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CalculadoraPrecoDemo } from "@/components/CalculadoraPreco";
+import { Clock } from "lucide-react";
+import { FeedProvasTelegram } from "@/components/DepoimentoTelegram";
 import { HeroVendasAnimadas } from "@/components/HeroVendasAnimadas";
-import { IndiceOportunidade } from "@/components/IndiceOportunidade";
 import { Selo } from "@/components/Selo";
-import {
-  brl,
-  maisVendidas as maisVendidasSeed,
-  oportunidadeDoDia as oportunidadeSeed,
-  tendencias as tendenciasSeed,
-  type Selo as SeloTipo,
-} from "@/data/facaevenda";
 import { landingTsl, type LandingCta, type Plan, type PlanId } from "@/data/landing";
-import { useOportunidades, useTendencias } from "@/lib/db";
+import { landingLp } from "@/data/landing-lp";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: landingTsl.meta.title },
-      { name: "description", content: landingTsl.meta.description },
-      { property: "og:title", content: landingTsl.meta.title },
-      { property: "og:description", content: landingTsl.meta.description },
+      { title: landingLp.meta.title },
+      { name: "description", content: landingLp.meta.description },
+      { property: "og:title", content: landingLp.meta.title },
+      { property: "og:description", content: landingLp.meta.description },
     ],
   }),
-  component: Landing,
+  component: LandingLp,
 });
 
 function CTA({
@@ -38,10 +31,10 @@ function CTA({
     return (
       <Link
         to="/assinar"
-        search={plano ? { plano } : { plano: "semestral" }}
+        search={{ plano: plano ?? "semestral" }}
         className="inline-flex items-center justify-center rounded-xl bg-success px-7 py-4 text-base font-semibold text-primary-foreground transition-colors hover:bg-success-hover"
       >
-        {children ?? landingTsl.hero.cta.label}
+        {children ?? landingLp.hero.cta.label}
       </Link>
     );
   }
@@ -50,7 +43,7 @@ function CTA({
       to={to}
       className="inline-flex items-center justify-center rounded-xl bg-success px-7 py-4 text-base font-semibold text-primary-foreground transition-colors hover:bg-success-hover"
     >
-      {children ?? landingTsl.hero.cta.label}
+      {children ?? landingLp.hero.cta.label}
     </Link>
   );
 }
@@ -71,6 +64,22 @@ function Secao({
 
 function Titulo({ children }: { children: React.ReactNode }) {
   return <h2 className="max-w-3xl text-3xl font-bold leading-tight md:text-5xl">{children}</h2>;
+}
+
+function Marquee() {
+  const text = landingLp.marquee.repeat(6);
+  return (
+    <div className="overflow-hidden border-y border-border bg-card/60 py-3" aria-hidden>
+      <div className="flex w-max animate-marquee">
+        <p className="whitespace-nowrap pr-8 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+          {text}
+        </p>
+        <p className="whitespace-nowrap pr-8 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+          {text}
+        </p>
+      </div>
+    </div>
+  );
 }
 
 function PlanCard({ plan, featured }: { plan: Plan; featured?: boolean }) {
@@ -112,306 +121,258 @@ function PlanCard({ plan, featured }: { plan: Plan; featured?: boolean }) {
   );
 }
 
-function Landing() {
-  const oportunidades = useOportunidades();
-  const tendenciasQ = useTendencias();
-
-  const oportunidadeDoDia = oportunidades.data?.doDia ?? oportunidadeSeed;
-  const tendencias =
-    tendenciasQ.data?.map((t) => ({ nome: t.nome, nota: t.nota, selo: t.selo })) ?? tendenciasSeed;
-  const maisVendidas =
-    oportunidades.data?.lista
-      .slice()
-      .sort((a, b) => b.indice - a.indice)
-      .slice(0, 4)
-      .map((o) => o.nome) ?? maisVendidasSeed;
-
-  const L = landingTsl;
-  const ops = L.ops;
+function LandingLp() {
+  const L = landingLp;
 
   return (
     <main>
+      {/* URGENCY */}
+      <div className="sticky top-0 z-50 bg-success px-4 py-2.5 text-center text-primary-foreground">
+        <p className="inline-flex items-center justify-center gap-2 text-sm font-semibold">
+          <Clock className="size-4 shrink-0" aria-hidden />
+          {L.urgency.label} {L.urgency.endsOn}
+        </p>
+      </div>
+
       {/* HERO */}
       <section className="gold-grid relative overflow-hidden px-6 pb-16 pt-16 md:pb-24 md:pt-24">
         <div className="mx-auto max-w-3xl text-center lg:max-w-4xl">
           <p className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-gold">
-            {L.hero.eyebrow}
+            {L.brand}
           </p>
-          <h1 className="mt-6 text-3xl font-bold leading-[1.1] md:text-5xl lg:text-[3.25rem]">
-            {L.hero.h1}
+          <h1 className="mt-6 text-2xl font-bold leading-[1.25] md:text-4xl lg:text-[2.35rem]">
+            {L.hero.h1.map((part) =>
+              part.highlight ? (
+                <span key={part.text} className="text-gold">
+                  {part.text}
+                </span>
+              ) : (
+                <span key={part.text}>{part.text}</span>
+              ),
+            )}
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">{L.hero.sub}</p>
+
           <div className="mx-auto mt-10 flex max-w-sm justify-center">
             <HeroVendasAnimadas />
           </div>
-          <div className="mt-8 flex justify-center">
-            <CTA to={L.hero.cta.to} plano="semestral">
+
+          <div className="mt-10 flex justify-center">
+            <CTA to={L.hero.cta.to} plano={L.hero.cta.plano}>
               {L.hero.cta.label}
             </CTA>
           </div>
-          <p className="mt-8 text-sm font-medium text-foreground">{L.hero.trust}</p>
+
+          <ul className="mt-8 flex flex-wrap justify-center gap-3">
+            {L.hero.trust.map((t) => (
+              <li
+                key={t.k}
+                className="rounded-xl border border-border bg-card/80 px-4 py-2.5 text-left text-sm"
+              >
+                <span className="block text-[10px] font-semibold uppercase tracking-widest text-gold">
+                  {t.k}
+                </span>
+                <span className="font-semibold">{t.v}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
-      {/* PROBLEMA */}
+      {/* ESFORÇO */}
       <Secao>
-        <Titulo>{L.problem.h2}</Titulo>
-        <p className="mt-6 max-w-2xl text-lg text-muted-foreground">{L.problem.p}</p>
-        <p className="mt-8 max-w-2xl text-lg font-medium">{L.problem.bridge}</p>
-        <ul className="mt-6 flex flex-wrap gap-3">
-          {L.problem.checklist.map((item) => (
-            <li
-              key={item}
-              className="rounded-full border border-border bg-card px-4 py-2 text-sm font-medium"
-            >
-              ✔ {item}
-            </li>
+        <Titulo>{L.effort.h2}</Titulo>
+        <p className="mt-6 max-w-2xl text-lg text-muted-foreground">{L.effort.p}</p>
+        <figure className="mt-10 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+          <img
+            src={L.effort.screenshot}
+            alt={L.effort.screenshotAlt}
+            width={1600}
+            height={900}
+            className="h-auto w-full"
+            loading="lazy"
+          />
+        </figure>
+        <div className="mt-8">
+          <CTA to={L.effort.cta.to} plano={L.effort.cta.plano}>
+            {L.effort.cta.label}
+          </CTA>
+        </div>
+      </Secao>
+
+      <Marquee />
+
+      {/* PROVAS */}
+      <Secao className="bg-card/40">
+        <Titulo>{L.proofs.h2}</Titulo>
+        <div className="mx-auto mt-10 max-w-xl">
+          <FeedProvasTelegram
+            titulo={L.proofs.feed.titulo}
+            subtitulo={L.proofs.feed.subtitulo}
+            items={L.proofs.items}
+          />
+        </div>
+        <div className="mt-10">
+          <CTA>Quero vender com o Radar agora</CTA>
+        </div>
+      </Secao>
+
+      {/* AUTORIDADE */}
+      <Secao>
+        <Titulo>{L.authority.h2}</Titulo>
+        <div className="mt-10 grid gap-6 md:grid-cols-3">
+          {L.authority.items.map((item) => (
+            <article key={item.titulo} className="rounded-3xl border border-border bg-card p-6">
+              <h3 className="font-display text-lg font-semibold">{item.titulo}</h3>
+              <p className="mt-3 text-sm text-muted-foreground">{item.texto}</p>
+            </article>
           ))}
-        </ul>
+        </div>
+        <div className="mt-10">
+          <CTA to={L.hero.cta.to} plano={L.hero.cta.plano}>
+            {L.hero.cta.label}
+          </CTA>
+        </div>
       </Secao>
 
-      {/* VERDADE */}
+      <Marquee />
+
+      {/* CATÁLOGO */}
       <Secao className="bg-card/40">
-        <p className="text-xs font-semibold uppercase tracking-widest text-gold">{L.truth.label}</p>
-        <p className="mt-4 max-w-3xl text-2xl font-bold leading-snug md:text-3xl">{L.truth.p}</p>
+        <Titulo>{L.catalog.h2}</Titulo>
+        <p className="mt-6 max-w-2xl text-muted-foreground">{L.catalog.p}</p>
+        <div className="mt-10 grid gap-6 sm:grid-cols-3">
+          {L.catalog.groups.map((g) => (
+            <div key={g.titulo} className="rounded-3xl border border-border bg-card p-6">
+              <h3 className="font-display text-lg font-semibold">{g.titulo}</h3>
+              <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+                {g.itens.map((i) => (
+                  <li key={i}>• {i}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <div className="mt-10">
+          <CTA to={L.catalog.cta.to} plano={L.catalog.cta.plano}>
+            {L.catalog.cta.label}
+          </CTA>
+        </div>
       </Secao>
 
-      {/* OFERTA PRO */}
+      {/* EXCLUSIVOS */}
       <Secao>
-        <p className="text-xs font-semibold uppercase tracking-widest text-gold">{L.offer.label}</p>
-        <Titulo>{L.offer.h2}</Titulo>
-        <p className="mt-6 max-w-2xl text-lg text-muted-foreground">{L.offer.p}</p>
-      </Secao>
-
-      {/* RADAR */}
-      <Secao className="bg-card/40">
-        <p className="text-xs font-semibold uppercase tracking-widest text-gold">{L.radar.label}</p>
-        <Titulo>{L.radar.h2}</Titulo>
-        <p className="mt-6 max-w-2xl text-lg text-muted-foreground">{L.radar.p}</p>
-      </Secao>
-
-      {/* DAILY */}
-      <Secao>
-        <Titulo>{L.daily.h2}</Titulo>
+        <Titulo>{L.exclusives.h2}</Titulo>
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {L.daily.items.map((d) => (
-            <article key={d.titulo} className="rounded-3xl border border-border bg-card p-6">
-              <p className="text-2xl" aria-hidden>
-                {d.icone}
+          {L.exclusives.items.map((item) => (
+            <article key={item.titulo} className="rounded-3xl border border-border bg-card p-6">
+              <h3 className="font-display text-lg font-semibold">{item.titulo}</h3>
+              <p className="mt-2 text-sm text-muted-foreground">{item.texto}</p>
+            </article>
+          ))}
+        </div>
+        <div className="mt-10">
+          <CTA to={L.exclusives.cta.to} plano={L.exclusives.cta.plano}>
+            {L.exclusives.cta.label}
+          </CTA>
+        </div>
+      </Secao>
+
+      {/* WHY */}
+      <Secao className="bg-card/40">
+        <Titulo>{L.why.h2}</Titulo>
+        <div className="mt-10 grid gap-6 md:grid-cols-2">
+          {L.why.points.map((p) => (
+            <div key={p.titulo} className="rounded-3xl border border-border bg-card p-6">
+              <h3 className="font-display text-xl font-semibold">{p.titulo}</h3>
+              <p className="mt-3 text-sm text-muted-foreground">{p.texto}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-10">
+          <CTA to={L.why.cta.to} plano={L.why.cta.plano}>
+            {L.why.cta.label}
+          </CTA>
+        </div>
+      </Secao>
+
+      {/* PLANO 4 PASSOS */}
+      <Secao>
+        <Titulo>{L.plan4.h2}</Titulo>
+        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {L.plan4.steps.map((s) => (
+            <article key={s.n} className="rounded-3xl border border-border bg-card p-6">
+              <p className="font-display text-3xl font-bold text-gold">{s.n}</p>
+              <h3 className="mt-3 font-display text-lg font-semibold">{s.titulo}</h3>
+              <p className="mt-2 text-sm text-muted-foreground">{s.texto}</p>
+            </article>
+          ))}
+        </div>
+        <div className="mt-10">
+          <CTA to={L.plan4.cta.to} plano={L.plan4.cta.plano}>
+            {L.plan4.cta.label}
+          </CTA>
+        </div>
+      </Secao>
+
+      {/* BÔNUS */}
+      <Secao className="bg-card/40">
+        <Titulo>E se você quiser acelerar as vendas?</Titulo>
+        <div className="mt-10 grid gap-6 md:grid-cols-2">
+          {L.bonus.map((b) => (
+            <article key={b.titulo} className="rounded-3xl border border-border bg-card p-6">
+              <h3 className="font-display text-xl font-semibold">{b.titulo}</h3>
+              <p className="mt-3 text-sm text-muted-foreground">{b.texto}</p>
+              <p className="mt-5 text-sm">
+                <span className="text-muted-foreground line-through">{b.de}</span>
+                <span className="ml-2 font-display text-2xl font-bold text-gold">{b.por}</span>
               </p>
-              <h3 className="mt-3 font-display text-lg font-semibold">{d.titulo}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{d.texto}</p>
+              <p className="mt-2 text-xs text-muted-foreground">{b.regra}</p>
             </article>
           ))}
         </div>
       </Secao>
 
-      {/* MANHÃ */}
-      <Secao className="bg-card/40">
-        <Titulo>{L.morning.h2}</Titulo>
-        <div className="mt-10 max-w-md rounded-3xl border border-border bg-card p-6 shadow-lg">
-          <p className="font-display text-xl font-semibold">{L.morning.saudacao}</p>
-          <p className="mt-6 text-xs font-semibold uppercase tracking-widest text-gold">
-            {L.morning.label}
-          </p>
-          <h3 className="mt-2 font-display text-2xl font-bold">{oportunidadeDoDia.nome}</h3>
-          <p className="mt-2 text-sm text-gold">
-            {"★".repeat(oportunidadeDoDia.demanda)} Alta procura
-          </p>
-          <p className="mt-4 text-sm text-muted-foreground">Lucro estimado</p>
-          <p className="font-display text-2xl font-bold text-gold">
-            {brl(oportunidadeDoDia.lucroEstimado)}
-          </p>
-          <Link
-            to="/app/oportunidades/$slug"
-            params={{ slug: oportunidadeDoDia.slug }}
-            className="mt-6 flex w-full items-center justify-center rounded-xl bg-success px-4 py-3 font-semibold text-primary-foreground transition-colors hover:bg-success-hover"
-          >
-            Começar agora
-          </Link>
-        </div>
-      </Secao>
-
-      {/* FICHA */}
+      {/* STACK + PLANOS */}
       <Secao>
-        <Titulo>{L.ficha.h2}</Titulo>
-        <div className="mt-10 grid gap-6 lg:grid-cols-2">
-          <div className="rounded-3xl border border-border bg-card p-6">
-            <img
-              src={oportunidadeDoDia.imagem}
-              alt={oportunidadeDoDia.nome}
-              width={1024}
-              height={768}
-              className="aspect-[16/10] w-full rounded-2xl object-cover"
-            />
-            <h3 className="mt-5 font-display text-2xl font-bold">{oportunidadeDoDia.nome}</h3>
-            <dl className="mt-5 grid grid-cols-2 gap-4 text-sm sm:grid-cols-3">
-              <div>
-                <dt className="text-xs text-muted-foreground">Preço sugerido</dt>
-                <dd className="mt-1 font-semibold">{brl(oportunidadeDoDia.precoSugerido)}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-muted-foreground">Custo por unidade</dt>
-                <dd className="mt-1 font-semibold">{brl(oportunidadeDoDia.custoUnitario)}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-muted-foreground">Lucro estimado</dt>
-                <dd className="mt-1 font-semibold text-gold">{brl(oportunidadeDoDia.lucroEstimado)}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-muted-foreground">Tempo de preparo</dt>
-                <dd className="mt-1 font-semibold">{oportunidadeDoDia.tempoMin} min</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-muted-foreground">Rendimento</dt>
-                <dd className="mt-1 font-semibold">{oportunidadeDoDia.rendimento}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-muted-foreground">Validade</dt>
-                <dd className="mt-1 font-semibold">{oportunidadeDoDia.validade}</dd>
-              </div>
-            </dl>
-            <p className="mt-6 text-sm text-muted-foreground">{L.ficha.more}</p>
-          </div>
-          <IndiceOportunidade
-            indice={oportunidadeDoDia.indice}
-            criterios={oportunidadeDoDia.criterios}
-          />
-        </div>
-      </Secao>
-
-      {/* CALCULADORA */}
-      <Secao className="bg-card/40">
-        <Titulo>{L.calc.h2}</Titulo>
-        <p className="mt-4 max-w-2xl text-muted-foreground">{L.calc.note}</p>
-        <div className="mt-10">
-          <CalculadoraPrecoDemo />
-        </div>
-      </Secao>
-
-      {/* OPS */}
-      <Secao>
-        <Titulo>{L.ops.h2}</Titulo>
-        <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-3xl border border-border bg-card p-6">
-            <p className="text-xs font-semibold uppercase tracking-widest text-gold">Produção hoje</p>
-            <ul className="mt-4 space-y-2 text-sm">
-              {ops.producao.map((t) => (
-                <li key={t} className="flex items-center gap-2">
-                  <span className="size-4 rounded border border-border" /> {t}
-                </li>
+        <Titulo>{L.stack.h2}</Titulo>
+        <div className="mt-10 overflow-hidden rounded-3xl border border-border bg-card">
+          <table className="w-full text-left text-sm">
+            <tbody>
+              {L.stack.rows.map((r) => (
+                <tr key={r.nome} className="border-b border-border/60">
+                  <td className="px-6 py-3">{r.nome}</td>
+                  <td className="px-6 py-3 text-muted-foreground">{r.valor}</td>
+                </tr>
               ))}
-            </ul>
-          </div>
-          <div className="rounded-3xl border border-border bg-card p-6">
-            <p className="text-xs font-semibold uppercase tracking-widest text-gold">Pedidos</p>
-            <ul className="mt-4 space-y-2 text-sm">
-              {ops.pedidos.map((p) => (
-                <li key={p.nome} className="flex justify-between gap-2">
-                  <span>{p.nome}</span>
-                  <span className="text-muted-foreground">{p.status}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="rounded-3xl border border-border bg-card p-6">
-            <p className="text-xs font-semibold uppercase tracking-widest text-gold">Clientes</p>
-            <p className="mt-4 font-display font-semibold">{ops.cliente.nome}</p>
-            <p className="mt-1 text-sm text-muted-foreground">{ops.cliente.resumo}</p>
-            <p className="mt-3 text-sm">🎂 {ops.cliente.aniversario}</p>
-          </div>
-          <div className="rounded-3xl border border-border bg-card p-6">
-            <p className="text-xs font-semibold uppercase tracking-widest text-gold">Financeiro hoje</p>
-            <p className="mt-4 text-sm text-muted-foreground">
-              Entrou {brl(ops.financeiro.entrou)} · Saiu {brl(ops.financeiro.saiu)}
-            </p>
-            <p className="mt-3 font-display text-3xl font-bold text-gold">
-              {brl(ops.financeiro.entrou - ops.financeiro.saiu)}
-            </p>
-            <p className="text-xs text-muted-foreground">lucro do dia</p>
-          </div>
+              <tr className="bg-secondary/40 font-semibold">
+                <td className="px-6 py-4" colSpan={2}>
+                  {L.stack.totalAvulso}
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </Secao>
+        <p className="mt-4 text-sm text-muted-foreground">{L.stack.nota}</p>
 
-      {/* SEMANAS + TENDÊNCIAS */}
-      <Secao className="bg-card/40">
-        <Titulo>{L.weeks.h2}</Titulo>
-        <div className="mt-10 grid gap-4 sm:grid-cols-3">
-          {L.weeks.items.map((w) => (
-            <div key={w.quando} className="rounded-2xl border border-border bg-card p-5">
-              <p className="text-xs uppercase tracking-widest text-gold">{w.quando}</p>
-              <p className="mt-2 font-display font-semibold">{w.nome}</p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-12 grid gap-10 lg:grid-cols-2">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-gold">Tendências</p>
-            <ul className="mt-4 space-y-3">
-              {tendencias.slice(0, 4).map((t) => (
-                <li key={t.nome} className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3 text-sm">
-                  <span className="font-medium">{t.nome}</span>
-                  <Selo selo={t.selo as SeloTipo} />
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-gold">Mais vendidas</p>
-            <ol className="mt-4 space-y-3">
-              {maisVendidas.map((nome, i) => (
-                <li key={nome} className="flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 text-sm">
-                  <span className="font-display font-bold text-gold">{i + 1}.</span>
-                  <span className="font-medium">{nome}</span>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </div>
-      </Secao>
-
-      {/* ÍNDICE copy */}
-      <Secao>
-        <Titulo>{L.indice.h2}</Titulo>
-        <p className="mt-6 max-w-2xl text-lg text-muted-foreground">{L.indice.p}</p>
-      </Secao>
-
-      {/* INCLUSOS */}
-      <Secao className="bg-card/40">
-        <Titulo>{L.inclusos.h2}</Titulo>
-        <ul className="mt-10 flex flex-wrap gap-3">
-          {L.inclusos.items.map((chip) => (
-            <li
-              key={chip}
-              className="rounded-full border border-border bg-card px-4 py-2 text-sm font-medium"
-            >
-              {chip}
-            </li>
-          ))}
-        </ul>
-      </Secao>
-
-      {/* CALENDÁRIO SAZONAL */}
-      <Secao>
-        <Titulo>{L.calendarioSazonal.h2}</Titulo>
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {L.calendarioSazonal.meses.map((c) => (
-            <div key={c.mes} className="rounded-2xl border border-border bg-card p-5">
-              <p className="text-xs uppercase tracking-widest text-gold">{c.mes}</p>
-              <p className="mt-1 font-display font-semibold">{c.data}</p>
-              <p className="mt-2 text-xs text-muted-foreground">{c.itens.join(" · ")}</p>
-            </div>
-          ))}
-        </div>
-      </Secao>
-
-      {/* PLANOS */}
-      <Secao className="bg-card/40">
-        <Titulo>{L.plansIntro}</Titulo>
+        <h2 className="mt-16 max-w-3xl text-3xl font-bold leading-tight md:text-4xl">
+          {L.plansIntro}
+        </h2>
         <div className="mt-10 grid gap-6 lg:grid-cols-3">
-          {L.plans.map((plan) => (
+          {landingTsl.plans.map((plan) => (
             <PlanCard key={plan.id} plan={plan} featured={plan.id === "semestral"} />
           ))}
+        </div>
+      </Secao>
+
+      {/* COMUNIDADE */}
+      <Secao className="bg-card/40">
+        <Titulo>{L.community.h2}</Titulo>
+        <p className="mt-6 max-w-2xl text-lg text-muted-foreground">{L.community.p}</p>
+        <div className="mt-8">
+          <CTA to={L.community.cta.to} plano={L.community.cta.plano}>
+            {L.community.cta.label}
+          </CTA>
         </div>
       </Secao>
 
@@ -434,7 +395,7 @@ function Landing() {
         </dl>
       </Secao>
 
-      {/* CTA FINAL */}
+      {/* FINAL */}
       <Secao className="bg-card/40">
         <h2 className="max-w-3xl text-3xl font-bold leading-tight md:text-5xl">{L.final.h2}</h2>
         <div className="mt-10 flex flex-wrap gap-4">

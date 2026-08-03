@@ -39,7 +39,7 @@ export const oportunidades: Oportunidade[] = [
   {
     slug: "morango-do-amor",
     nome: "Morango do Amor",
-    categoria: "Doces",
+    categoria: "Oportunidades Virais",
     selo: "Explodindo",
     imagem: morangoImg,
     indice: 93,
@@ -93,7 +93,7 @@ export const oportunidades: Oportunidade[] = [
   {
     slug: "brownie-dubai",
     nome: "Brownie Dubai",
-    categoria: "Doces",
+    categoria: "Doces Clássicos",
     selo: "Viral",
     imagem: brownieImg,
     indice: 91,
@@ -139,7 +139,7 @@ export const oportunidades: Oportunidade[] = [
   {
     slug: "copo-da-felicidade",
     nome: "Copo da Felicidade",
-    categoria: "Doces",
+    categoria: "Doces Clássicos",
     selo: "Crescendo",
     imagem: copoImg,
     indice: 87,
@@ -182,7 +182,7 @@ export const oportunidades: Oportunidade[] = [
   {
     slug: "brigadeiro-gourmet",
     nome: "Brigadeiro Gourmet",
-    categoria: "Doces",
+    categoria: "Doces Clássicos",
     selo: "Venda constante",
     imagem: brigadeiroImg,
     indice: 84,
@@ -237,14 +237,14 @@ export const calendario = [
 ];
 
 export const categorias = [
-  { nome: "Bolos", icone: "🍰", total: 42 },
-  { nome: "Pudins", icone: "🍮", total: 18 },
-  { nome: "Bebidas", icone: "🥤", total: 24 },
-  { nome: "Doces", icone: "🍫", total: 63 },
-  { nome: "Salgados", icone: "🥧", total: 37 },
-  { nome: "Marmitas", icone: "🍛", total: 29 },
-  { nome: "Café", icone: "🍞", total: 21 },
-  { nome: "Biscoitos", icone: "🍪", total: 16 },
+  { nome: "Oportunidades Virais", icone: "🔥", total: 20 },
+  { nome: "Doces Clássicos", icone: "🍫", total: 21 },
+  { nome: "Bolos", icone: "🎂", total: 14 },
+  { nome: "Sobremesas", icone: "🍮", total: 12 },
+  { nome: "Salgados", icone: "🥟", total: 14 },
+  { nome: "Bebidas", icone: "🥤", total: 8 },
+  { nome: "Festa Junina", icone: "🌽", total: 9 },
+  { nome: "Sazonais", icone: "🥚", total: 14 },
 ];
 
 export const navGrupos = [
@@ -264,6 +264,7 @@ export const navGrupos = [
       { to: "/app/producao", label: "Produção", icone: "📦" },
       { to: "/app/compras", label: "Compras", icone: "🛒" },
       { to: "/app/pedidos", label: "Pedidos", icone: "📝" },
+      { to: "/app/cardapio", label: "Cardápio", icone: "📋" },
     ],
   },
   {

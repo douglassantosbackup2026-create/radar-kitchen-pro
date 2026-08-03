@@ -5,6 +5,12 @@ import { Pagina, Painel } from "@/components/app/Pagina";
 import { Carregando, Erro, Vazio } from "@/components/app/Estado";
 import { brl } from "@/data/facaevenda";
 import {
+  ASSINATURA_MENSAL,
+  faltaParaAssinatura,
+  faturamentoPagoMes,
+  recuperouAssinatura,
+} from "@/lib/onboarding";
+import {
   useAtualizarPedido,
   useCriarPedido,
   useExcluirPedido,
@@ -49,8 +55,28 @@ function Pedidos() {
     }
   }, [clienteSearch]);
 
+  const faturamento = faturamentoPagoMes(data ?? []);
+  const recuperou = recuperouAssinatura(faturamento);
+  const falta = faltaParaAssinatura(faturamento);
+
   return (
     <Pagina titulo="Pedidos" descricao="Muito simples. Quem pediu, o quê, quanto e se já pagou.">
+      <div
+        className={`mb-6 rounded-2xl border px-4 py-3 text-sm ${
+          recuperou
+            ? "border-success/30 bg-success/10 text-success"
+            : "border-border bg-card text-muted-foreground"
+        }`}
+      >
+        {recuperou ? (
+          <p className="font-medium">Assinatura do mês já paga com as vendas ({brl(ASSINATURA_MENSAL)})</p>
+        ) : (
+          <p>
+            Faltam <span className="font-semibold text-foreground">{brl(falta)}</span> em pedidos
+            pagos para recuperar a assinatura
+          </p>
+        )}
+      </div>
       <Painel className="overflow-x-auto">
         {isPending && <Carregando />}
         {isError && <Erro />}

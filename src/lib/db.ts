@@ -35,8 +35,15 @@ const imagens: Record<string, string> = {
   "brigadeiro-gourmet": brigadeiroImg,
 };
 
+const PLACEHOLDER_IMG = "/receitas/placeholder.svg";
+
 export function imagemDe(slug: string) {
-  return imagens[slug] ?? morangoImg;
+  return imagens[slug] ?? `/receitas/${slug}.png`;
+}
+
+/** Fallback neutro quando a foto da receita ainda não existe. */
+export function imagemFallback() {
+  return PLACEHOLDER_IMG;
 }
 
 function parseComprasDetalhe(raw: Json, compras: string[], custoUnitario: number, rendimento: string): CompraDetalhe[] {
@@ -87,7 +94,7 @@ function paraOportunidade(row: Tables["oportunidades"]["Row"]): Oportunidade {
     nome: row.nome,
     categoria: row.categoria,
     selo: row.selo as Selo,
-    imagem: row.imagem_url || imagemDe(row.slug),
+    imagem: row.imagem_url || imagemDe(row.slug) || imagemFallback(),
     indice: row.indice,
     criterios: (Array.isArray(row.criterios) ? row.criterios : []) as unknown as Criterio[],
     lucroEstimado: Number(row.lucro_estimado),

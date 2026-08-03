@@ -12,10 +12,14 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AssinarRouteImport } from './routes/assinar'
+import { Route as LpRouteImport } from './routes/lp'
+import { Route as Lp2RouteImport } from './routes/lp2'
+import { Route as Lp3RouteImport } from './routes/lp3'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppBibliotecaRouteImport } from './routes/app.biblioteca'
 import { Route as AppCalculadorasRouteImport } from './routes/app.calculadoras'
 import { Route as AppCalendarioRouteImport } from './routes/app.calendario'
+import { Route as AppCardapioRouteImport } from './routes/app.cardapio'
 import { Route as AppClientesRouteImport } from './routes/app.clientes'
 import { Route as AppComprasRouteImport } from './routes/app.compras'
 import { Route as AppDesafiosRouteImport } from './routes/app.desafios'
@@ -42,6 +46,21 @@ const AssinarRoute = AssinarRouteImport.update({
   path: '/assinar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LpRoute = LpRouteImport.update({
+  id: '/lp',
+  path: '/lp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Lp2Route = Lp2RouteImport.update({
+  id: '/lp2',
+  path: '/lp2',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Lp3Route = Lp3RouteImport.update({
+  id: '/lp3',
+  path: '/lp3',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -60,6 +79,11 @@ const AppCalculadorasRoute = AppCalculadorasRouteImport.update({
 const AppCalendarioRoute = AppCalendarioRouteImport.update({
   id: '/calendario',
   path: '/calendario',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCardapioRoute = AppCardapioRouteImport.update({
+  id: '/cardapio',
+  path: '/cardapio',
   getParentRoute: () => AppRoute,
 } as any)
 const AppClientesRoute = AppClientesRouteImport.update({
@@ -117,9 +141,13 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/assinar': typeof AssinarRoute
+  '/lp': typeof LpRoute
+  '/lp2': typeof Lp2Route
+  '/lp3': typeof Lp3Route
   '/app/biblioteca': typeof AppBibliotecaRoute
   '/app/calculadoras': typeof AppCalculadorasRoute
   '/app/calendario': typeof AppCalendarioRoute
+  '/app/cardapio': typeof AppCardapioRoute
   '/app/clientes': typeof AppClientesRoute
   '/app/compras': typeof AppComprasRoute
   '/app/desafios': typeof AppDesafiosRoute
@@ -135,9 +163,13 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/assinar': typeof AssinarRoute
+  '/lp': typeof LpRoute
+  '/lp2': typeof Lp2Route
+  '/lp3': typeof Lp3Route
   '/app/biblioteca': typeof AppBibliotecaRoute
   '/app/calculadoras': typeof AppCalculadorasRoute
   '/app/calendario': typeof AppCalendarioRoute
+  '/app/cardapio': typeof AppCardapioRoute
   '/app/clientes': typeof AppClientesRoute
   '/app/compras': typeof AppComprasRoute
   '/app/desafios': typeof AppDesafiosRoute
@@ -155,9 +187,13 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/assinar': typeof AssinarRoute
+  '/lp': typeof LpRoute
+  '/lp2': typeof Lp2Route
+  '/lp3': typeof Lp3Route
   '/app/biblioteca': typeof AppBibliotecaRoute
   '/app/calculadoras': typeof AppCalculadorasRoute
   '/app/calendario': typeof AppCalendarioRoute
+  '/app/cardapio': typeof AppCardapioRoute
   '/app/clientes': typeof AppClientesRoute
   '/app/compras': typeof AppComprasRoute
   '/app/desafios': typeof AppDesafiosRoute
@@ -176,9 +212,13 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/assinar'
+    | '/lp'
+    | '/lp2'
+    | '/lp3'
     | '/app/biblioteca'
     | '/app/calculadoras'
     | '/app/calendario'
+    | '/app/cardapio'
     | '/app/clientes'
     | '/app/compras'
     | '/app/desafios'
@@ -194,9 +234,13 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/assinar'
+    | '/lp'
+    | '/lp2'
+    | '/lp3'
     | '/app/biblioteca'
     | '/app/calculadoras'
     | '/app/calendario'
+    | '/app/cardapio'
     | '/app/clientes'
     | '/app/compras'
     | '/app/desafios'
@@ -213,9 +257,13 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/assinar'
+    | '/lp'
+    | '/lp2'
+    | '/lp3'
     | '/app/biblioteca'
     | '/app/calculadoras'
     | '/app/calendario'
+    | '/app/cardapio'
     | '/app/clientes'
     | '/app/compras'
     | '/app/desafios'
@@ -233,6 +281,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   AssinarRoute: typeof AssinarRoute
+  LpRoute: typeof LpRoute
+  Lp2Route: typeof Lp2Route
+  Lp3Route: typeof Lp3Route
 }
 
 declare module '@tanstack/react-router' {
@@ -256,6 +307,27 @@ declare module '@tanstack/react-router' {
       path: '/assinar'
       fullPath: '/assinar'
       preLoaderRoute: typeof AssinarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lp': {
+      id: '/lp'
+      path: '/lp'
+      fullPath: '/lp'
+      preLoaderRoute: typeof LpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lp2': {
+      id: '/lp2'
+      path: '/lp2'
+      fullPath: '/lp2'
+      preLoaderRoute: typeof Lp2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lp3': {
+      id: '/lp3'
+      path: '/lp3'
+      fullPath: '/lp3'
+      preLoaderRoute: typeof Lp3RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/': {
@@ -284,6 +356,13 @@ declare module '@tanstack/react-router' {
       path: '/calendario'
       fullPath: '/app/calendario'
       preLoaderRoute: typeof AppCalendarioRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/cardapio': {
+      id: '/app/cardapio'
+      path: '/cardapio'
+      fullPath: '/app/cardapio'
+      preLoaderRoute: typeof AppCardapioRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/clientes': {
@@ -363,6 +442,7 @@ interface AppRouteChildren {
   AppBibliotecaRoute: typeof AppBibliotecaRoute
   AppCalculadorasRoute: typeof AppCalculadorasRoute
   AppCalendarioRoute: typeof AppCalendarioRoute
+  AppCardapioRoute: typeof AppCardapioRoute
   AppClientesRoute: typeof AppClientesRoute
   AppComprasRoute: typeof AppComprasRoute
   AppDesafiosRoute: typeof AppDesafiosRoute
@@ -380,6 +460,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppBibliotecaRoute: AppBibliotecaRoute,
   AppCalculadorasRoute: AppCalculadorasRoute,
   AppCalendarioRoute: AppCalendarioRoute,
+  AppCardapioRoute: AppCardapioRoute,
   AppClientesRoute: AppClientesRoute,
   AppComprasRoute: AppComprasRoute,
   AppDesafiosRoute: AppDesafiosRoute,
@@ -399,6 +480,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   AssinarRoute: AssinarRoute,
+  LpRoute: LpRoute,
+  Lp2Route: Lp2Route,
+  Lp3Route: Lp3Route,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
